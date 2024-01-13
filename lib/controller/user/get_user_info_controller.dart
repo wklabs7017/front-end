@@ -5,12 +5,12 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-class UserController extends GetxController {
-  final BASE_URL = '${ApiRoutes.baseUrl}${ApiRoutes.signUp}';
+class GetUserInfoController extends GetxController {
+  final BASE_URL = '${ApiRoutes.baseUrl}${ApiRoutes.user}';
 
   final Dio dio = Dio();
 
-  Future<User?> getUser(int userId) async {
+  Future<User?> getUserInformation(int userId) async {
     try {
       final response = await dio.get(
         BASE_URL,
