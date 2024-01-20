@@ -1,23 +1,22 @@
 import 'package:bsn_v2/const/app_colors.dart';
 import 'package:bsn_v2/const/app_text_style.dart';
+import 'package:bsn_v2/model/device.dart';
 import 'package:bsn_v2/model/smart_rack.dart';
 import 'package:flutter/material.dart';
 import 'package:data_table_2/data_table_2.dart';
 
-class CustomEquipmentStatusTable extends StatefulWidget {
-  final List<SmartRack> getDeviceSmartRackStatus;
+class CustomDeviceStatusTable extends StatefulWidget {
+  final List<Device> getDeviceStatus;
 
-  const CustomEquipmentStatusTable(
-      {Key? key, required this.getDeviceSmartRackStatus})
+  const CustomDeviceStatusTable({Key? key, required this.getDeviceStatus})
       : super(key: key);
 
   @override
-  _CustomEquipmentStatusTableState createState() =>
-      _CustomEquipmentStatusTableState();
+  _CustomDeviceStatusTableState createState() =>
+      _CustomDeviceStatusTableState();
 }
 
-class _CustomEquipmentStatusTableState
-    extends State<CustomEquipmentStatusTable> {
+class _CustomDeviceStatusTableState extends State<CustomDeviceStatusTable> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -64,9 +63,9 @@ class _CustomEquipmentStatusTableState
                         style: AppTextStyles.medium
                             .copyWith(color: AppColors.talbeTextColor))),
               ],
-              source: SmartRackStatusDataSource(
-                  getDeviceSmartRackStatus: widget
-                      .getDeviceSmartRackStatus), // 수정된 부분            rowsPerPage: 10,
+              source: DeviceStatusDataSource(
+                  getDeviceStatus: widget
+                      .getDeviceStatus), // 수정된 부분            rowsPerPage: 10,
             ),
           ),
         ],
@@ -75,22 +74,24 @@ class _CustomEquipmentStatusTableState
   }
 }
 
-class SmartRackStatusDataSource extends DataTableSource {
-  final List<SmartRack> getDeviceSmartRackStatus;
+class DeviceStatusDataSource extends DataTableSource {
+  final List<Device> getDeviceStatus;
 
-  SmartRackStatusDataSource({required this.getDeviceSmartRackStatus});
+  DeviceStatusDataSource({required this.getDeviceStatus});
 
   @override
   DataRow? getRow(int index) {
-    if (index >= getDeviceSmartRackStatus.length) return null;
-    final smartRackStatus = getDeviceSmartRackStatus[index];
+    if (index >= getDeviceStatus.length) return null;
+    final deviceStatus = getDeviceStatus[index];
 
     return DataRow(cells: [
-      DataCell(Text(smartRackStatus.id.toString() ?? 'x')), // .toString() 추가
-      DataCell(Text(smartRackStatus.ledMode)),
-      DataCell(Text(smartRackStatus.ledOn.toString())),
-      DataCell(Text(smartRackStatus.number.toString())),
-      DataCell(Text(smartRackStatus.lastWorkedAt.toString())),
+      DataCell(Text(deviceStatus.id.toString() ?? 'x')), // .toString() 추가
+      DataCell(Text(deviceStatus.name)),
+      DataCell(Text(deviceStatus.manufacturerName)),
+      DataCell(Text(deviceStatus.manufacturerContact)),
+      DataCell(Text(deviceStatus.type)),
+      DataCell(Text(deviceStatus.tenantId.toString())),
+      DataCell(Text(deviceStatus.equippedAt.toString())),
     ]);
   }
 
@@ -98,7 +99,7 @@ class SmartRackStatusDataSource extends DataTableSource {
   bool get isRowCountApproximate => false;
 
   @override
-  int get rowCount => getDeviceSmartRackStatus.length; // 수정
+  int get rowCount => getDeviceStatus.length; // 수정
 
   @override
   int get selectedRowCount => 0;
