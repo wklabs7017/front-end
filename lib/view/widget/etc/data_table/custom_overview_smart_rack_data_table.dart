@@ -6,16 +6,21 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 // 나머지 import 문들...
-class CustomSmartRackStatusDataTable extends StatelessWidget {
+class CustomOverviewSmartRackStatusDataTable extends StatelessWidget {
   final RxList<SmartRack> smartRacks; // RxList
 
-  CustomSmartRackStatusDataTable({required this.smartRacks});
+  CustomOverviewSmartRackStatusDataTable({required this.smartRacks});
 
   @override
   Widget build(BuildContext context) {
     return Obx(() => SingleChildScrollView(
           scrollDirection: Axis.vertical,
           child: Table(
+            columnWidths: const <int, TableColumnWidth>{
+              0: FixedColumnWidth(25.0), // 첫 번째 열의 너비를 40.0으로 고정
+
+              5: FixedColumnWidth(80.0), // 첫 번째 열의 너비를 40.0으로 고정
+            },
             border: TableBorder.all(
               color: Colors.transparent,
               width: 30,
@@ -24,16 +29,16 @@ class CustomSmartRackStatusDataTable extends StatelessWidget {
                   TableRow(
                     decoration: BoxDecoration(
                       border: Border(
-                        bottom: BorderSide(color: Colors.blue),
+                        bottom: BorderSide(color: Colors.blue, width: 2),
                       ),
                     ),
                     children: [
-                      paddedCell('No.', 14, Colors.blue),
-                      paddedCell('랙 이름', 14, Colors.blue),
-                      paddedCell('관수 상태', 14, Colors.blue),
-                      paddedCell('적재 상태', 14, Colors.blue),
-                      paddedCell('LED 상태', 14, Colors.blue),
-                      paddedCell('마지막 연결 시간', 14, Colors.blue),
+                      paddedCell('No.', 9, Colors.blue),
+                      paddedCell('랙 이름', 9, Colors.blue),
+                      paddedCell('관수 상태', 9, Colors.blue),
+                      paddedCell('적재 상태', 9, Colors.blue),
+                      paddedCell('LED 상태', 9, Colors.blue),
+                      paddedCell('마지막 연결 시간', 9, Colors.blue),
                     ],
                   ),
                 ] +
@@ -53,7 +58,15 @@ class CustomSmartRackStatusDataTable extends StatelessWidget {
   Widget paddedCell(String text, double fontSize, Color color) {
     return Padding(
       padding: EdgeInsets.all(3.0),
-      child: Text(text, style: TextStyle(fontSize: fontSize, color: color)),
+      child: Center(
+          child: Column(
+        children: [
+          Text(text,
+              style: AppTextStyles.bold
+                  .copyWith(fontSize: fontSize, color: color)),
+          SizedBox(height: 10),
+        ],
+      )),
     );
   }
 
