@@ -43,6 +43,11 @@ dependencies:
   get: ^4.6.6
   data_table_2: ^2.5.9
   intl: ^0.19.0
+  flutter_secure_storage: ^9.0.0
+  dio: ^5.4.0
+  shared_preferences: ^2.2.2
+  syncfusion_flutter_charts: ^24.1.47+2
+  desktop_window: ^0.4.0
 
 dev_dependencies:
   flutter_test:

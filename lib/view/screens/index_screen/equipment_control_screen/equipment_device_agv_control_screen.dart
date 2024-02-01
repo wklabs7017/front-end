@@ -8,7 +8,7 @@ import 'package:bsn_v2/controller/device/agv_device/patch_device_agv_mode_contro
 import 'package:bsn_v2/controller/device/agv_device/post_device_agv_status_controller.dart';
 import 'package:bsn_v2/controller/device/device/delete_device_status_controller.dart';
 import 'package:bsn_v2/controller/device/device/get_device_status_controller.dart';
-import 'package:bsn_v2/controller/device/smart_rack_device/smart_rack/get_device_smart_rack_controller.dart';
+import 'package:bsn_v2/controller/device/smart_rack_device/smart_rack/get_device_smart_rack_status_controller.dart';
 import 'package:bsn_v2/controller/manufacturer/get_manufacturer_controller.dart';
 import 'package:bsn_v2/model/smart_rack.dart';
 import 'package:bsn_v2/view/widget/button/custom_default_control_button.dart';
@@ -24,6 +24,7 @@ import 'package:bsn_v2/view/widget/etc/custom_device_status_table.dart';
 import 'package:bsn_v2/view/widget/etc/custom_velocity_control_pannel.dart';
 import 'package:bsn_v2/view/widget/etc/smart_rack_status_table.dart';
 import 'package:bsn_v2/view/widget/etc/user_management_table.dart';
+import 'package:bsn_v2/view/widget/text_field/new_custom_text_form_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -39,18 +40,12 @@ class EquipmentDeviceAgvControlScreen extends StatefulWidget {
 class _EquipmentDeviceAgvControlScreenState
     extends State<EquipmentDeviceAgvControlScreen> {
   // GetX 컨트롤러들을 여기에 선언합니다.
-  late DeleteDeviceStautsController deleteDeviceController;
-  late GetDeviceAgvStatusController getDeviceAgvController;
-  late GetDeviceAGVController getDeviceController;
-  late PatchDeviceAgvBatteryLevelController
-      patchDeviceAgvBatteryLevelController;
-  late PatchDeviceAgvDriveDistanceController
-      patchDeviceAgvDriveDistanceController;
-  late PatchDeviceAgvModeController patchDeviceAgvModeController;
-  late PostDeviceAgvStatusController postDeviceAgvStatusController;
 
   final getManufacturerController = Get.find<GetManufacturerController>();
   final postDeviceAgvController = Get.find<PostDeviceAgvStatusController>();
+
+  var getDeviceAgvController = Get.find<GetDeviceAgvStatusController>();
+  var getDeviceController = Get.find<GetDeviceAGVController>();
 
   late List<String> dropdownOptions3;
 
@@ -60,17 +55,6 @@ class _EquipmentDeviceAgvControlScreenState
   @override
   void initState() {
     super.initState();
-
-    // initState에서 GetX 컨트롤러들을 초기화합니다.
-    deleteDeviceController = Get.find<DeleteDeviceStautsController>();
-    getDeviceAgvController = Get.find<GetDeviceAgvStatusController>();
-    getDeviceController = Get.find<GetDeviceAGVController>();
-    patchDeviceAgvBatteryLevelController =
-        Get.find<PatchDeviceAgvBatteryLevelController>();
-    patchDeviceAgvDriveDistanceController =
-        Get.find<PatchDeviceAgvDriveDistanceController>();
-    patchDeviceAgvModeController = Get.find<PatchDeviceAgvModeController>();
-    postDeviceAgvStatusController = Get.find<PostDeviceAgvStatusController>();
 
     // 페이지로 돌아갈 때마다 컨트롤러를 다시 초기화합니다.
     dropdownOptions3 = getManufacturerController.manufacturerDetail
@@ -110,11 +94,17 @@ class _EquipmentDeviceAgvControlScreenState
       padding: const EdgeInsets.all(8.0),
       child: Row(
         children: [
-          Expanded(flex: 1, child: Text(label)),
           Expanded(
-            flex: 2,
-            child: TextField(controller: controller),
-          ),
+              flex: 1,
+              child: Text(label, style: AppTextStyles.medium.copyWith())),
+          Expanded(
+              flex: 2,
+              child: Container(
+                  decoration:
+                      BoxDecoration(borderRadius: BorderRadius.circular(20)),
+                  width: 40,
+                  height: 30,
+                  child: NewCustomTextFormField(maxLength: 20))),
         ],
       ),
     );
@@ -278,114 +268,126 @@ class _EquipmentDeviceAgvControlScreenState
                       showDialog(
                         context: context,
                         builder: (BuildContext context) {
-                          return AlertDialog(
-                            title: Text('더블클릭 다이얼로그'),
-                            content: Column(
-                              children: [
-                                buildTextField(
-                                  label: 'Name:',
-                                  controller:
-                                      postDeviceAgvController.nameController,
-                                ),
-                                buildTextField(
-                                  label: 'Model Name:',
-                                  controller: postDeviceAgvController
-                                      .modelNameController,
-                                ),
-                                buildTextField(
-                                  label: 'Manufacturer:',
-                                  controller: postDeviceAgvController
-                                      .manufacturerNameController,
-                                ),
-                                DropdownButtonFormField<String>(
-                                  decoration: InputDecoration(
-                                    labelText: 'Select Mode',
-                                    // Add any additional styling or decoration as needed
-                                  ),
-                                  value: dropdownOptions3.contains(
+                          return Theme(
+                            data: Theme.of(context).copyWith(
+                              dialogBackgroundColor: AppColors.backgroundColor,
+                            ), // 다이얼로그 배경색을 흰색으로 오버라이드
+                            child: Dialog(
+                              shape: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(20)),
+                              elevation: 0,
+                              backgroundColor: Colors.white,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(20)),
+                                width: 700,
+                                height: 600,
+                                child: AlertDialog(
+                                  elevation: 0,
+                                  backgroundColor: Colors.white,
+                                  title: Center(
+                                      child: Text('장비 추가',
+                                          style: AppTextStyles.bold
+                                              .copyWith(fontSize: 30))),
+                                  content: Column(
+                                    children: [
+                                      buildTextField(
+                                          label: 'Name  ',
+                                          controller: postDeviceAgvController
+                                              .nameController),
+                                      buildTextField(
+                                        label: 'Model Name  ',
+                                        controller: postDeviceAgvController
+                                            .modelNameController,
+                                      ),
+                                      buildTextField(
+                                        label: 'Manufacturer Name  ',
+                                        controller: postDeviceAgvController
+                                            .manufacturerName2Controller,
+                                      ),
+                                      buildTextField(
+                                        label: 'tenantID  ',
+                                        controller: postDeviceAgvController
+                                            .tenantIdController,
+                                      ),
+                                      DropdownButtonFormField<String>(
+                                        decoration: InputDecoration(
+                                          labelText: 'Select Status',
+                                          // Add any additional styling or decoration as needed
+                                        ),
+                                        value: dropdownOptions2.contains(
+                                                postDeviceAgvController
+                                                    .statusController.text)
+                                            ? postDeviceAgvController
+                                                .statusController.text
+                                            : null,
+                                        items: dropdownOptions2
+                                            .map((String value) {
+                                          return DropdownMenuItem<String>(
+                                            value: value,
+                                            child: Text(value),
+                                          );
+                                        }).toList(),
+                                        onChanged: (String? newValue) {
+                                          if (newValue != null) {
+                                            postDeviceAgvController
+                                                .statusController
+                                                .text = newValue;
+                                          }
+                                        },
+                                      ),
+                                      DropdownButtonFormField<String>(
+                                        decoration: InputDecoration(
+                                          labelText: 'Select Mode',
+                                          // Add any additional styling or decoration as needed
+                                        ),
+                                        value: dropdownOptions1.contains(
+                                                postDeviceAgvController
+                                                    .modeController.text)
+                                            ? postDeviceAgvController
+                                                .modeController.text
+                                            : null,
+                                        items: dropdownOptions1
+                                            .map((String value) {
+                                          return DropdownMenuItem<String>(
+                                            value: value,
+                                            child: Text(value),
+                                          );
+                                        }).toList(),
+                                        onChanged: (String? newValue) {
+                                          if (newValue != null) {
+                                            postDeviceAgvController
+                                                .modeController.text = newValue;
+                                          }
+                                        },
+                                      ),
+                                      ElevatedButton(
+                                        onPressed: () {
                                           postDeviceAgvController
-                                              .manufacturerNameController.text)
-                                      ? postDeviceAgvController
-                                          .manufacturerNameController.text
-                                      : null,
-                                  items: dropdownOptions3.map((String value) {
-                                    return DropdownMenuItem<String>(
-                                      value: value,
-                                      child: Text(value),
-                                    );
-                                  }).toList(),
-                                  onChanged: (String? newValue) {
-                                    if (newValue != null) {
-                                      postDeviceAgvController
-                                          .manufacturerNameController
-                                          .text = newValue;
-                                    }
-                                  },
-                                ),
-                                DropdownButtonFormField<String>(
-                                  decoration: InputDecoration(
-                                    labelText: 'Select Mode',
-                                    // Add any additional styling or decoration as needed
+                                              .initializeData();
+                                          print(postDeviceAgvController
+                                              .modeController.text);
+                                          print(postDeviceAgvController
+                                              .statusController.text);
+                                          print(postDeviceAgvController
+                                              .manufacturerName2Controller
+                                              .text);
+                                        },
+                                        child: Text('Submit'),
+                                      ),
+                                    ],
                                   ),
-                                  value: dropdownOptions2.contains(
-                                          postDeviceAgvController
-                                              .statusController.text)
-                                      ? postDeviceAgvController
-                                          .statusController.text
-                                      : null,
-                                  items: dropdownOptions2.map((String value) {
-                                    return DropdownMenuItem<String>(
-                                      value: value,
-                                      child: Text(value),
-                                    );
-                                  }).toList(),
-                                  onChanged: (String? newValue) {
-                                    if (newValue != null) {
-                                      postDeviceAgvController
-                                          .statusController.text = newValue;
-                                    }
-                                  },
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(context); // 다이얼로그 닫기
+                                      },
+                                      child: Text('확인'),
+                                    ),
+                                  ],
                                 ),
-                                DropdownButtonFormField<String>(
-                                  decoration: InputDecoration(
-                                    labelText: 'Select Mode',
-                                    // Add any additional styling or decoration as needed
-                                  ),
-                                  value: dropdownOptions1.contains(
-                                          postDeviceAgvController
-                                              .modeController.text)
-                                      ? postDeviceAgvController
-                                          .modeController.text
-                                      : null,
-                                  items: dropdownOptions1.map((String value) {
-                                    return DropdownMenuItem<String>(
-                                      value: value,
-                                      child: Text(value),
-                                    );
-                                  }).toList(),
-                                  onChanged: (String? newValue) {
-                                    if (newValue != null) {
-                                      postDeviceAgvController
-                                          .modeController.text = newValue;
-                                    }
-                                  },
-                                ),
-                                ElevatedButton(
-                                  onPressed: () {
-                                    postDeviceAgvController.initializeData();
-                                  },
-                                  child: Text('Submit'),
-                                ),
-                              ],
-                            ),
-                            actions: [
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.pop(context); // 다이얼로그 닫기
-                                },
-                                child: Text('확인'),
                               ),
-                            ],
+                            ),
                           );
                         },
                       );

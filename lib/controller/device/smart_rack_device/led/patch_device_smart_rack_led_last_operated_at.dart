@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class PatchDeviceEquippedAtController extends GetxController {
+class PatchDeviceSmartRackLedLastOperatedAtController extends GetxController {
   int? id;
   String? accessToken;
 
@@ -29,22 +29,22 @@ class PatchDeviceEquippedAtController extends GetxController {
     id = prefs.getInt('id');
 
     if (accessToken != null && id != null) {
-      callPatchDeviceSmartRackLastOperatedAt();
+      callPatchDeviceSmartRackLedLastOperatedAt();
     } else {
       print('Access Token or ID is null');
     }
   }
 
-  void callPatchDeviceSmartRackLastOperatedAt() async {
+  void callPatchDeviceSmartRackLedLastOperatedAt() async {
     try {
-      await patchDeviceSmartRackLastOperatedAt(
+      await patchDeviceSmartRackLedLastOperatedAt(
           id!, accessToken!, lastOperatedAt!);
     } catch (e) {
       print('Error: $e');
     }
   }
 
-  Future<void> patchDeviceSmartRackLastOperatedAt(
+  Future<void> patchDeviceSmartRackLedLastOperatedAt(
       int id, String accessToken, DateTime lastOperatedAt) async {
     try {
       var response = await dio.patch(

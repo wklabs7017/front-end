@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class CustomTextFormField extends StatelessWidget {
   final TextEditingController? controller;
@@ -11,8 +13,11 @@ class CustomTextFormField extends StatelessWidget {
   final InputBorder? enabledBorder;
   final InputBorder? errorBorder;
 
-  const CustomTextFormField({
+  final int? maxLength;
+
+  CustomTextFormField({
     super.key,
+    required this.maxLength,
     this.controller,
     this.validator,
     this.keyboardType,
@@ -27,20 +32,29 @@ class CustomTextFormField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 60,
+      height: 50.h,
+      width: 200.w,
       child: TextFormField(
+        maxLength: maxLength,
+        maxLengthEnforcement: MaxLengthEnforcement.truncateAfterCompositionEnds,
         cursorColor: Colors.white,
         controller: controller,
         validator: validator,
         focusNode: focusNode,
-        style: TextStyle(
+        style: const TextStyle(
           color: Colors.white, // 사용자 입력 텍스트의 색상을 지정합니다.
           // 여기에 다른 텍스트 스타일 속성을 추가할 수 있습니다.
         ),
         keyboardType: keyboardType,
         decoration: InputDecoration(
+          counterText: '',
+          errorStyle: TextStyle(
+            fontSize: 7.5, // 폰트 크기 조절
+            color: Colors.red, // 폰트 색상 조절
+          ),
+          errorMaxLines: 1, // 에러 메시지 최대 줄 수 지정
           hintText: hintText,
-          hintStyle: TextStyle(color: Colors.white),
+          hintStyle: const TextStyle(color: Colors.white),
           border: const UnderlineInputBorder(),
           focusedBorder: focusedBorder ??
               const UnderlineInputBorder(

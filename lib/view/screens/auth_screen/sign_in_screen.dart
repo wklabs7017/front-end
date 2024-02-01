@@ -1,81 +1,32 @@
 import 'package:bsn_v2/const/App_colors.dart';
 import 'package:bsn_v2/const/app_text_style.dart';
+import 'package:bsn_v2/controller/auth/sign_in_controller.dart';
 import 'package:bsn_v2/view/widget/button/custom_elevated_button.dart';
 import 'package:bsn_v2/view/widget/text_field/custom_text_form_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
-class LogInScreen extends StatefulWidget {
-  const LogInScreen({super.key});
+class SignInScreen extends StatefulWidget {
+  const SignInScreen({super.key});
 
-  static const String route = '/login';
+  static const String route = '/signIn';
 
   @override
-  State<LogInScreen> createState() => _LogInScreenState();
+  State<SignInScreen> createState() => _SignInScreenState();
 }
 
-class _LogInScreenState extends State<LogInScreen> {
-  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
-
-  final TextEditingController _controller = TextEditingController();
-
-  void _login() {
-    if (formKey.currentState!.validate()) {
-      // 유효성 검사를 통과하면 로그인 로직을 실행합니다.
-      print(
-          '로그인 버튼 눌림: Email: ${emailController.text}, Password: ${passwordController.text}');
-      // 로그인 로직을 여기에 추가합니다. 예: 서버에 로그인 요청 등
-    }
-  }
-
-  @override
-  void dispose() {
-    // 여기에서 컨트롤러들을 정리합니다.
-    emailController.dispose();
-    passwordController.dispose();
-    super.dispose();
-  }
-
+class _SignInScreenState extends State<SignInScreen> {
   @override
   Widget build(BuildContext context) {
+    final signInController = Get.find<SignInController>();
+
     double screenWidth = MediaQuery.of(context).size.width;
     bool isDesktop = screenWidth > 600; // 600px를 기준으로 데스크탑 화면으로 간주
 
     // 컨테이너 크기를 화면에 맞춰 조정
     double containerWidth = isDesktop ? 600 : screenWidth * 0.9;
     double containerHeight = isDesktop ? 450 : screenWidth * 0.9;
-    String? IdValidator(String? value) {
-      if (value == null || value.isEmpty) {
-        return 'Please enter your email';
-      }
-      return null;
-    }
-
-    String? passwordValidator(String? value) {
-      if (value == null || value.isEmpty) {
-        return 'Please enter your password';
-      }
-
-      // 비밀번호 최소 길이
-      if (value.length < 8) {
-        return 'Password must be at least 8 characters';
-      }
-
-      // 숫자 포함 여부 검사
-      if (!RegExp(r'[0-9]').hasMatch(value)) {
-        return 'Password must contain at least one number';
-      }
-
-      // 특수 문자 포함 여부 검사
-      if (!RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(value)) {
-        return 'Password must contain at least one special character';
-      }
-
-      return null;
-    }
 
     return Scaffold(
       resizeToAvoidBottomInset: true, // 키보드 오버레이 방지
@@ -155,7 +106,7 @@ class _LogInScreenState extends State<LogInScreen> {
                                   child: Container(
                                 padding: EdgeInsets.all(16), // 적절한 패딩 설정
                                 child: Form(
-                                  key: formKey,
+                                  key: signInController.signInFormKey,
                                   child: Padding(
                                     padding:
                                         EdgeInsets.symmetric(horizontal: 3.0.w),
@@ -164,33 +115,30 @@ class _LogInScreenState extends State<LogInScreen> {
                                           CrossAxisAlignment.center,
                                       children: <Widget>[
                                         CustomTextFormField(
-                                          onFieldSubmitted: (value) {
-                                            _login();
-                                          },
                                           maxLength: 30,
-                                          controller: emailController,
+                                          controller:
+                                              signInController.userIdController,
                                           hintText: 'ID',
-                                          keyboardType:
-                                              TextInputType.emailAddress,
-                                          validator: IdValidator,
+                                          validator:
+                                              signInController.userIdValidator,
                                         ),
                                         SizedBox(height: 10),
                                         CustomTextFormField(
-                                          onFieldSubmitted: (value) {
-                                            _login();
-                                          },
                                           maxLength: 20,
-                                          controller: passwordController,
+                                          controller: signInController
+                                              .passwordController,
                                           hintText: 'Password',
                                           obscureText: true,
-                                          validator: passwordValidator,
+                                          validator: signInController
+                                              .passwordValidator,
                                         ),
                                         SizedBox(height: 10),
                                         CustomElevatedButton(
                                           onPressed: () {
-                                            if (formKey.currentState!
+                                            if (signInController
+                                                .signInFormKey.currentState!
                                                 .validate()) {
-                                              Get.offAllNamed('/index');
+                                              signInController.callSignIn();
                                             }
                                           },
                                           buttonName: 'Log In',
@@ -224,7 +172,7 @@ class _LogInScreenState extends State<LogInScreen> {
                                 .copyWith(color: Colors.white, fontSize: 15)),
                         InkWell(
                             onTap: () {
-                              Get.toNamed('/forgotIdPassword');
+                              Get.toNamed('/accountReset');
                             },
                             child: Text('Forgot User name or Password?',
                                 style: AppTextStyles.medium.copyWith(

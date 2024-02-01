@@ -1,3 +1,4 @@
+import 'package:bsn_v2/const/App_colors.dart';
 import 'package:flutter/material.dart';
 
 class CustomElevatedButton extends StatelessWidget {
@@ -23,16 +24,17 @@ class CustomElevatedButton extends StatelessWidget {
       ),
       style: TextButton.styleFrom(
         elevation: 2.0, // 클릭 시 그림자 효과
-        primary: Colors.blue,
+
         minimumSize: Size(
-          MediaQuery.of(context).size.width * 0.7,
-          48,
+          MediaQuery.of(context).size.width * 0.45,
+          43,
         ),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(5),
+          borderRadius: BorderRadius.circular(10),
         ),
-        backgroundColor:
-            onPressed != null ? Colors.blue : Colors.grey, // 비활성 상태일 때 배경색 변경
+        backgroundColor: onPressed != null
+            ? AppColors.primaryColor
+            : Colors.grey, // 비활성 상태일 때 배경색 변경
       ),
     );
   }

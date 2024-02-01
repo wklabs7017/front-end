@@ -1,3 +1,4 @@
+import 'package:bsn_v2/const/App_colors.dart';
 import 'package:bsn_v2/const/app_text_style.dart';
 import 'package:bsn_v2/view/widget/button/custom_emergency_stop_button.dart';
 import 'package:bsn_v2/view/widget/button/custom_task_button.dart';
@@ -10,72 +11,84 @@ class CustomOverviewScreenAppBar extends StatelessWidget
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding:
-          const EdgeInsets.only(top: 8.0, right: 8.0, left: 8.0, bottom: 10),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 8.0),
-            child:
-                Text('개요', style: AppTextStyles.medium.copyWith(fontSize: 20)),
+    return Container(
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(
+            color: AppColors.lineColor, // Border color
+            width: 2.0, // Border width
           ),
-          Center(
-            child: Container(
-              child: Row(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Row(
+        ),
+      ),
+      child: Padding(
+        padding:
+            const EdgeInsets.only(top: 8.0, right: 8.0, left: 8.0, bottom: 10),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 8.0),
+              child: Text('개요',
+                  style: AppTextStyles.bold
+                      .copyWith(fontSize: 20, color: AppColors.basicTextColor)),
+            ),
+            Center(
+              child: Container(
+                child: Row(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        children: [
+                          SizedBox(width: 10),
+                          Text('작업 :  ',
+                              style:
+                                  AppTextStyles.medium.copyWith(fontSize: 16)),
+                          Text('{(작업내용)}',
+                              style:
+                                  AppTextStyles.medium.copyWith(fontSize: 16)),
+                          Text('대기중',
+                              style:
+                                  AppTextStyles.medium.copyWith(fontSize: 16)),
+                        ],
+                      ),
+                    ),
+                    Spacer(),
+                    Row(
                       children: [
-                        SizedBox(width: 10),
-                        Text('작업 :  ',
-                            style: AppTextStyles.medium.copyWith(fontSize: 16)),
-                        Text('{(작업내용)}',
-                            style: AppTextStyles.medium.copyWith(fontSize: 16)),
-                        Text('대기중',
-                            style: AppTextStyles.medium.copyWith(fontSize: 16)),
+                        CustomMiniTaskButton(
+                            onTap: () {},
+                            text: '작압 시작',
+                            color: Color(0xFF9FDCA6)),
+                        CustomMiniTaskButton(
+                            onTap: () {},
+                            text: '일시정지',
+                            color: Color(0xFFFF6C6C)),
+                        SizedBox(width: 7),
+                        CustomMiniTaskButton(
+                            onTap: () {},
+                            text: '작업중지',
+                            color: Color(0xFFFFCD6C)),
+                        SizedBox(width: 7),
                       ],
                     ),
-                  ),
-                  Spacer(),
-                  Row(
-                    children: [
-                      CustomTaskButton(text: '작업시작'),
-                      SizedBox(width: 5),
-                      CustomTaskButton(text: '일시정지'),
-                      SizedBox(width: 5),
-                      CustomTaskButton(text: '작업중지'),
-                      SizedBox(width: 5),
-                    ],
-                  ),
-                ],
-              ),
-              width: 200.w,
-              height: 35,
-              decoration: ShapeDecoration(
-                color: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(43),
+                  ],
                 ),
-                shadows: [
-                  BoxShadow(
-                    color: Color(0x3F000000),
-                    blurRadius: 4,
-                    offset: Offset(0, 4),
-                    spreadRadius: 0,
-                  ),
-                ],
+                width: 180.w,
+                height: 40,
+                decoration: BoxDecoration(
+                    color: AppColors.lineColor,
+                    borderRadius: BorderRadius.circular(5),
+                    border: Border.all(color: AppColors.lineColor, width: 2.0)),
               ),
             ),
-          ),
-          CustomEmergencyStopButton(),
-        ],
+            CustomEmergencyStopButton(),
+          ],
+        ),
       ),
     );
   }
 
   @override
-  Size get preferredSize => Size.fromHeight(60); // 여기에서 AppBar의 높이를 조절할 수 있습니다.
+  Size get preferredSize => Size.fromHeight(70); // 여기에서 AppBar의 높이를 조절할 수 있습니다.
 }

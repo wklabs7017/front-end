@@ -12,8 +12,8 @@ class PatchDeviceAgvStatusController extends GetxController {
   String? accessToken;
   final Dio dio = Dio();
 
-  final BASE_URL = '${ApiRoutes.baseUrl}${ApiRoutes.patchDeviceModelName}';
-  TextEditingController modelNameController = TextEditingController();
+  final BASE_URL = '${ApiRoutes.baseUrl}${ApiRoutes.patchDeviceAgvStatus}';
+  TextEditingController statusController = TextEditingController();
 
   @override
   void onInit() {
@@ -27,27 +27,27 @@ class PatchDeviceAgvStatusController extends GetxController {
     id = prefs.getInt('id');
 
     if (accessToken != null && id != null) {
-      callPatchModelNameDevice();
+      callPatchStatusDevice();
     } else {
       print('Access Token or ID is null');
     }
   }
 
-  void callPatchModelNameDevice() async {
+  void callPatchStatusDevice() async {
     try {
-      await patchModelNameDevice(id!, accessToken!, modelNameController.text);
+      await patchStatusDevice(id!, accessToken!, statusController.text);
     } catch (e) {
       print('Error fetching SmartRack status: $e');
     }
   }
 
-  Future<void> patchModelNameDevice(
-      int id, String accessToken, String modelName) async {
+  Future<void> patchStatusDevice(
+      int id, String accessToken, String status) async {
     try {
       var response = await dio.patch(
         '$BASE_URL?id=$id',
         data: {
-          'model_name': modelName,
+          'status': status,
         },
         options: Options(headers: {'Authorization': 'Bearer $accessToken'}),
       );

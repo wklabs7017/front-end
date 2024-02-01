@@ -8,19 +8,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class GetDviceAgvStautsController extends GetxController {
+class GetDeviceAgvStatusController extends GetxController {
   int? id;
   String? accessToken;
   final Dio dio = Dio();
 
   final BASE_URL = '${ApiRoutes.baseUrl}${ApiRoutes.getDeviceAgv}';
 
-  var deviceAgvStauts = <AGV>[].obs;
+  var agvStatus = <AGV>[].obs;
+
+  var agvs = <AGV>[].obs;
 
   @override
   void onInit() {
     super.onInit();
     initializeData();
+    print(agvs.value);
   }
 
   void initializeData() async {
@@ -29,42 +32,78 @@ class GetDviceAgvStautsController extends GetxController {
     id = prefs.getInt('id');
 
     if (accessToken != null && id != null) {
-      callGetDeviceStatus();
+      fetchDevicesInRange(5, 50, accessToken!);
     } else {
       print('Access Token or ID is null');
     }
   }
 
-  void callGetDeviceStatus() async {
-    try {
-      var agv = await getDeviceAgvStatus(id!, accessToken!);
-      deviceAgvStauts.value = agv;
-    } catch (e) {
-      print('Error fetching SmartRack status: $e');
+  Future<RxList<AGV>> fetchDevicesInRange(
+      int startId, int endId, String accessToken) async {
+    for (int currentId = startId; currentId <= endId; currentId++) {
+      try {
+        var response = await getDeviceAGVStatus(currentId, accessToken);
+        if (response.isNotEmpty) {
+          agvs.addAll(response);
+        }
+      } catch (e) {
+        // 오류 발생 시 해당 ID를 건너뛰고 로그 출력
+        print('Error fetching AGV status for ID $currentId: $e');
+      }
     }
-  }
 
-  Future<List<AGV>> getDeviceAgvStatus(int id, String accessToken) async {
+    return agvs;
+  }
+  // void callGetDeviceStatus() async {
+  //   id = 5;
+  //   try {
+  //     print(id);
+  //     var device = await getDeviceStatus(id!, accessToken!);
+  //     deviceStauts.value = device;
+  //   } catch (e) {
+  //     print('Error fetching devices status: $e');
+  //   }
+  // }
+
+  Future<List<AGV>> getDeviceAGVStatus(int id, String accessToken) async {
     try {
+      // Making a GET request to the API
       var response = await dio.get(
         '$BASE_URL?id=$id',
         options: Options(headers: {'Authorization': 'Bearer $accessToken'}),
       );
 
+      // Checking if the response status code is 200 (OK) and data is not null
       if (response.statusCode == 200 && response.data != null) {
-        print(response.statusCode);
-        List<dynamic> responseData = response.data;
-        return responseData.map((data) => AGV.fromJson(data)).toList();
+        // Initializing an empty list to store Device objects
+        List<AGV> agvStatus = [];
+
+        // If the response data is a Map, it means there is a single device status.
+        // Convert this map to a Device object and add it to the list.
+        if (response.data is Map<String, dynamic>) {
+          agvStatus.add(AGV.fromJson(response.data));
+        }
+        // If the response data is a List, iterate over it and
+        // convert each item to a Device object and add to the list.
+        else if (response.data is List) {
+          agvStatus = (response.data as List)
+              .map<AGV>((data) => AGV.fromJson(data as Map<String, dynamic>))
+              .toList();
+        }
+        // If the data is neither a Map nor a List, throw an exception.
+        else {
+          throw Exception('Failed to load Device status');
+        }
+
+        // Return the list of Device objects
+        return agvStatus;
       } else {
-        throw Exception('Failed to load SmartRack status');
+        throw Exception('Failed to load Device status');
       }
-    } on DioException catch (e) {
-      print('DioException: ${e.message}');
-
-      throw e;
-    } catch (e) {
+    }
+    // Catching any errors and printing them
+    catch (e) {
       print('Exception: $e');
-
       throw e;
     }
   }

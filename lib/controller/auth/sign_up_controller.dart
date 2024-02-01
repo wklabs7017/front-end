@@ -18,14 +18,14 @@ class SignUpController extends GetxController {
 
   final BASE_URL = '${ApiRoutes.baseUrl}${ApiRoutes.signUp}';
 
-  Future<void> saveAccessToken(String? id) async {
+  Future<void> saveId(int? id) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('id', id ?? '');
+    await prefs.setInt('id', id ?? -1);
   }
 
-  Future<int?> getAccessToken() async {
+  Future<String?> getAccessToken() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getInt('id');
+    return prefs.getString('access_token');
   }
 
   String? userIdValidator(String? value) {
@@ -89,10 +89,32 @@ class SignUpController extends GetxController {
 
     if (isSuccess) {
       // 성공 시 페이지 이동
-      Get.offAllNamed('/signIn'); // 성공 시 이동할 페이지 경로
+      saveId(id);
+      _showSignUpSuccessDialog();
     } else {
       print('문제가 발생하였습니다. 관리자에게 문의해주세요.');
     }
+  }
+
+  void _showSignUpSuccessDialog() {
+    showDialog(
+      context: Get.context!, // Getx의 context 사용
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("회원가입 성공"),
+          content: Text("로그인 해주세요"),
+          actions: <Widget>[
+            TextButton(
+              child: Text("닫기"),
+              onPressed: () {
+                Navigator.of(context).pop(); // 다이얼로그 닫기
+                Get.offAllNamed('/signIn'); // 성공 시 이동할 페이지 경로
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Future<bool> signUp(
@@ -104,17 +126,25 @@ class SignUpController extends GetxController {
         'email': email,
         'password': password,
       });
-      if (res.statusCode == 201) {
-        id = res.data;
-        saveAccessToken(id);
-        return true; // 성공 시 true 반환
+      if (res.statusCode == 201 || res.statusCode == 200) {
+        // res.data가 Map<String, dynamic> 타입으로 예상됩니다.
+        // Map에서 필요한 데이터(예: id)를 추출합니다.
+        var responseData = Map<String, dynamic>.from(res.data);
+        if (responseData.containsKey('id')) {
+          id = responseData['id']; // id 키를 사용하여 값을 가져옵니다.
+        }
+
+        saveId(id as int?); // id를 int? 타입으로 캐스팅하여 saveId에 전달합니다.
+
+        print(id);
+        return true;
       }
       print(res.statusCode);
-
-      return false; // 상태 코드가 200이 아니거나 'status'가 'error'인 경우
+      return false;
     } on DioException catch (e) {
+      print(id);
       print(e.message);
-      return false; // 네트워크 오류 또는 기타 예외 발생 시
+      return false;
     }
   }
 

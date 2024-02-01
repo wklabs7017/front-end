@@ -1,5 +1,6 @@
 import 'package:bsn_v2/const/App_colors.dart';
 import 'package:bsn_v2/const/app_text_style.dart';
+import 'package:bsn_v2/controller/auth/account_reset_controller.dart';
 import 'package:bsn_v2/view/widget/alert/custom_basic_alert.dart';
 import 'package:bsn_v2/view/widget/button/custom_elevated_button.dart';
 import 'package:bsn_v2/view/widget/text_field/custom_text_form_field.dart';
@@ -8,18 +9,20 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'dart:ui' as ui; // 흐림 효과를 위해 필요합니다.
 
-class ForgotIdPasswordScreen extends StatefulWidget {
-  const ForgotIdPasswordScreen({super.key});
+class AccountResetScreen extends StatefulWidget {
+  const AccountResetScreen({super.key});
 
-  static const String route = 'forgotIdPassword';
+  static const String route = 'accountReset';
 
   @override
-  State<ForgotIdPasswordScreen> createState() => _ForgotIdPasswordScreenState();
+  State<AccountResetScreen> createState() => _AccountResetScreenState();
 }
 
-class _ForgotIdPasswordScreenState extends State<ForgotIdPasswordScreen> {
+class _AccountResetScreenState extends State<AccountResetScreen> {
   @override
   Widget build(BuildContext context) {
+    final accountResetController = Get.find<AccountResetController>();
+
     // 화면 너비를 확인
     double screenWidth = MediaQuery.of(context).size.width;
     bool isDesktop = screenWidth > 600; // 600px를 기준으로 데스크탑 화면으로 간주
@@ -27,20 +30,6 @@ class _ForgotIdPasswordScreenState extends State<ForgotIdPasswordScreen> {
     // 컨테이너 크기를 화면에 맞춰 조정
     double containerWidth = isDesktop ? 600 : screenWidth * 0.9;
     double containerHeight = isDesktop ? 450 : screenWidth * 0.75;
-
-    String? emailValidator(String? value) {
-      if (value == null || value.isEmpty) {
-        return 'Please enter your email';
-      }
-      // 이메일 형식을 검증하는 정규 표현식
-      final emailRegex = RegExp(
-        r'^[a-zA-Z0-9._]+@[a-zA-Z0-9]+\.[a-zA-Z]+',
-      );
-      if (!emailRegex.hasMatch(value)) {
-        return 'Invalid email format';
-      }
-      return null;
-    }
 
     return Scaffold(
       body: Center(
@@ -109,7 +98,7 @@ class _ForgotIdPasswordScreenState extends State<ForgotIdPasswordScreen> {
                                 child: Container(
                                   padding: EdgeInsets.all(16), // 적절한 패딩 설정
                                   child: Form(
-                                    key: formKey,
+                                    key: accountResetController.emailFormKey,
                                     child: Padding(
                                       padding: EdgeInsets.symmetric(
                                           horizontal: 3.0.w),
@@ -119,35 +108,40 @@ class _ForgotIdPasswordScreenState extends State<ForgotIdPasswordScreen> {
                                         children: <Widget>[
                                           CustomTextFormField(
                                             maxLength: 30,
-                                            controller: emailController,
+                                            controller: accountResetController
+                                                .emailController,
                                             hintText: 'Email',
                                             keyboardType:
                                                 TextInputType.emailAddress,
-                                            validator: emailValidator,
+                                            validator: accountResetController
+                                                .emailValidator,
                                           ),
                                           SizedBox(height: 10.h),
                                           CustomElevatedButton(
                                             onPressed: () {
-                                              if (formKey.currentState!
+                                              if (accountResetController
+                                                  .emailFormKey.currentState!
                                                   .validate()) {
-                                                showDialog(
-                                                  context: context,
-                                                  builder:
-                                                      (BuildContext context) {
-                                                    return CustomBasicAlert(
-                                                        showCancelButton:
-                                                            false, // Cancel 버튼 숨김
-
-                                                        title:
-                                                            'A temporary ID and password have been sent to you. ',
-                                                        content:
-                                                            ' Please check your email!',
-                                                        onPressed: () {
-                                                          Get.offAllNamed(
-                                                              '/login');
-                                                        });
-                                                  },
-                                                );
+                                                accountResetController
+                                                    .initializeData();
+                                                // showDialog(
+                                                //   context: context,
+                                                //   builder:
+                                                //       (BuildContext context) {
+                                                //     return CustomBasicAlert(
+                                                //         showCancelButton:
+                                                //             false, // Cancel 버튼 숨김
+                                                //
+                                                //         title:
+                                                //             'A temporary ID and password have been sent to you. ',
+                                                //         content:
+                                                //             ' Please check your email!',
+                                                //         onPressed: () {
+                                                //           Get.offAllNamed(
+                                                //               '/signIn');
+                                                //         });
+                                                //   },
+                                                //);
                                               }
                                             },
                                             buttonName: 'confirm',

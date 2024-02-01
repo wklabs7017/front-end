@@ -1,188 +1,176 @@
 import 'package:flutter/material.dart';
+import 'dart:math';
 
-import 'data_source.dart';
-// Copyright 2019 The Flutter team. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
-
-// The file was extracted from GitHub: https://github.com/flutter/gallery
-// Changes and modifications by Maxim Saplin, 2021
-
-class PaginatedDataTableDemo extends StatefulWidget {
-  const PaginatedDataTableDemo({super.key});
-
-  @override
-  PaginatedDataTableDemoState createState() => PaginatedDataTableDemoState();
+ThemeData blackSlider(BuildContext context) {
+  return Theme.of(context).copyWith(
+      sliderTheme: SliderThemeData(
+          rangeThumbShape:
+              const RectRangeSliderThumbShape(enabledThumbRadius: 8),
+          thumbShape: const RectSliderThumbShape(enabledThumbRadius: 8),
+          thumbColor: Colors.grey[800],
+          activeTrackColor: Colors.grey[700],
+          inactiveTrackColor: Colors.grey[400],
+          activeTickMarkColor: Colors.white,
+          inactiveTickMarkColor: Colors.white));
 }
 
-class PaginatedDataTableDemoState extends State<PaginatedDataTableDemo>
-    with RestorationMixin {
-  final RestorableDessertSelections _dessertSelections =
-      RestorableDessertSelections();
-  final RestorableInt _rowIndex = RestorableInt(0);
-  final RestorableInt _rowsPerPage =
-      RestorableInt(PaginatedDataTable.defaultRowsPerPage);
-  final RestorableBool _sortAscending = RestorableBool(true);
-  final RestorableIntN _sortColumnIndex = RestorableIntN(null);
-  late DessertDataSource _dessertsDataSource;
-  bool initialized = false;
+class RectRangeSliderThumbShape extends RangeSliderThumbShape {
+  const RectRangeSliderThumbShape({
+    this.enabledThumbRadius = 10.0,
+    this.disabledThumbRadius,
+    this.elevation = 1.0,
+    this.pressedElevation = 6.0,
+  });
+
+  final double enabledThumbRadius;
+
+  final double? disabledThumbRadius;
+  double get _disabledThumbRadius => disabledThumbRadius ?? enabledThumbRadius;
+
+  final double elevation;
+
+  final double pressedElevation;
 
   @override
-  String get restorationId => 'paginated_data_table_demo';
+  Size getPreferredSize(bool isEnabled, bool isDiscrete) {
+    return Size.fromRadius(
+        isEnabled == true ? enabledThumbRadius : _disabledThumbRadius);
+  }
 
   @override
-  void restoreState(RestorationBucket? oldBucket, bool initialRestore) {
-    registerForRestoration(_dessertSelections, 'selected_row_indices');
-    registerForRestoration(_rowIndex, 'current_row_index');
-    registerForRestoration(_rowsPerPage, 'rows_per_page');
-    registerForRestoration(_sortAscending, 'sort_ascending');
-    registerForRestoration(_sortColumnIndex, 'sort_column_index');
+  void paint(
+    PaintingContext context,
+    Offset center, {
+    required Animation<double> activationAnimation,
+    required Animation<double> enableAnimation,
+    bool isDiscrete = false,
+    bool isEnabled = false,
+    bool? isOnTop,
+    required SliderThemeData sliderTheme,
+    TextDirection? textDirection,
+    Thumb? thumb,
+    bool? isPressed,
+  }) {
+    assert(sliderTheme.showValueIndicator != null);
+    assert(sliderTheme.overlappingShapeStrokeColor != null);
 
-    if (!initialized) {
-      _dessertsDataSource = DessertDataSource(context);
-      initialized = true;
+    final Canvas canvas = context.canvas;
+    final Tween<double> radiusTween = Tween<double>(
+      begin: _disabledThumbRadius,
+      end: enabledThumbRadius,
+    );
+    final ColorTween colorTween = ColorTween(
+      begin: sliderTheme.disabledThumbColor,
+      end: sliderTheme.thumbColor,
+    );
+    final double radius = radiusTween.evaluate(enableAnimation);
+    final Tween<double> elevationTween = Tween<double>(
+      begin: elevation,
+      end: pressedElevation,
+    );
+
+    if (isOnTop ?? false) {
+      final Paint strokePaint = Paint()
+        ..color = sliderTheme.overlappingShapeStrokeColor!
+        ..strokeWidth = 1.0
+        ..style = PaintingStyle.stroke;
+      canvas.drawRect(
+          Rect.fromCenter(
+              center: center, width: 2 * radius, height: 2 * radius),
+          strokePaint);
     }
-    switch (_sortColumnIndex.value) {
-      case 0:
-        _dessertsDataSource.sort<String>((d) => d.name, _sortAscending.value);
-        break;
-      case 1:
-        _dessertsDataSource.sort<num>((d) => d.calories, _sortAscending.value);
-        break;
-      case 2:
-        _dessertsDataSource.sort<num>((d) => d.fat, _sortAscending.value);
-        break;
-      case 3:
-        _dessertsDataSource.sort<num>((d) => d.carbs, _sortAscending.value);
-        break;
-      case 4:
-        _dessertsDataSource.sort<num>((d) => d.protein, _sortAscending.value);
-        break;
-      case 5:
-        _dessertsDataSource.sort<num>((d) => d.sodium, _sortAscending.value);
-        break;
-      case 6:
-        _dessertsDataSource.sort<num>((d) => d.calcium, _sortAscending.value);
-        break;
-      case 7:
-        _dessertsDataSource.sort<num>((d) => d.iron, _sortAscending.value);
-        break;
-    }
-    _dessertsDataSource.updateSelectedDesserts(_dessertSelections);
-    _dessertsDataSource.addListener(_updateSelectedDessertRowListener);
+
+    final Color color = colorTween.evaluate(enableAnimation)!;
+
+    final double evaluatedElevation =
+        isPressed! ? elevationTween.evaluate(activationAnimation) : elevation;
+    final Path shadowPath = Path()
+      ..addArc(
+          Rect.fromCenter(
+              center: center, width: 2 * radius, height: 2 * radius),
+          0,
+          pi * 2);
+    canvas.drawShadow(shadowPath, Colors.black, evaluatedElevation, true);
+
+    canvas.drawRect(
+      Rect.fromCenter(center: center, width: 2 * radius, height: 2 * radius),
+      Paint()..color = color,
+    );
+  }
+}
+
+class RectSliderThumbShape extends SliderComponentShape {
+  const RectSliderThumbShape({
+    this.enabledThumbRadius = 10.0,
+    this.disabledThumbRadius,
+    this.elevation = 1.0,
+    this.pressedElevation = 6.0,
+  });
+
+  final double enabledThumbRadius;
+
+  final double? disabledThumbRadius;
+  double get _disabledThumbRadius => disabledThumbRadius ?? enabledThumbRadius;
+
+  final double elevation;
+
+  final double pressedElevation;
+
+  @override
+  Size getPreferredSize(bool isEnabled, bool isDiscrete) {
+    return Size.fromRadius(
+        isEnabled == true ? enabledThumbRadius : _disabledThumbRadius);
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (!initialized) {
-      _dessertsDataSource = DessertDataSource(context);
-      initialized = true;
-    }
-    _dessertsDataSource.addListener(_updateSelectedDessertRowListener);
-  }
+  void paint(
+    PaintingContext context,
+    Offset center, {
+    required Animation<double> activationAnimation,
+    required Animation<double> enableAnimation,
+    required bool isDiscrete,
+    required TextPainter labelPainter,
+    required RenderBox parentBox,
+    required SliderThemeData sliderTheme,
+    required TextDirection textDirection,
+    required double value,
+    required double textScaleFactor,
+    required Size sizeWithOverflow,
+  }) {
+    assert(sliderTheme.disabledThumbColor != null);
+    assert(sliderTheme.thumbColor != null);
 
-  void _updateSelectedDessertRowListener() {
-    _dessertSelections.setDessertSelections(_dessertsDataSource.desserts);
-  }
+    final Canvas canvas = context.canvas;
+    final Tween<double> radiusTween = Tween<double>(
+      begin: _disabledThumbRadius,
+      end: enabledThumbRadius,
+    );
+    final ColorTween colorTween = ColorTween(
+      begin: sliderTheme.disabledThumbColor,
+      end: sliderTheme.thumbColor,
+    );
 
-  void sort<T>(
-    Comparable<T> Function(Dessert d) getField,
-    int columnIndex,
-    bool ascending,
-  ) {
-    _dessertsDataSource.sort<T>(getField, ascending);
-    setState(() {
-      _sortColumnIndex.value = columnIndex;
-      _sortAscending.value = ascending;
-    });
-  }
+    final Color color = colorTween.evaluate(enableAnimation)!;
+    final double radius = radiusTween.evaluate(enableAnimation);
 
-  @override
-  void dispose() {
-    _rowsPerPage.dispose();
-    _sortColumnIndex.dispose();
-    _sortAscending.dispose();
-    _dessertsDataSource.removeListener(_updateSelectedDessertRowListener);
-    _dessertsDataSource.dispose();
-    super.dispose();
-  }
+    final Tween<double> elevationTween = Tween<double>(
+      begin: elevation,
+      end: pressedElevation,
+    );
 
-  @override
-  Widget build(BuildContext context) {
-    return ListView(
-      restorationId: 'paginated_data_table_list_view',
-      padding: const EdgeInsets.all(16),
-      children: [
-        PaginatedDataTable(
-          header: const Text('PaginatedDataTable'),
-          rowsPerPage: _rowsPerPage.value,
-          onRowsPerPageChanged: (value) {
-            setState(() {
-              _rowsPerPage.value = value!;
-            });
-          },
-          initialFirstRowIndex: _rowIndex.value,
-          onPageChanged: (rowIndex) {
-            setState(() {
-              _rowIndex.value = rowIndex;
-            });
-          },
-          sortColumnIndex: _sortColumnIndex.value,
-          sortAscending: _sortAscending.value,
-          onSelectAll: _dessertsDataSource.selectAll,
-          columns: [
-            DataColumn(
-              label: const Text('Desert'),
-              onSort: (columnIndex, ascending) =>
-                  sort<String>((d) => d.name, columnIndex, ascending),
-            ),
-            DataColumn(
-              label: const Text('Calories'),
-              numeric: true,
-              onSort: (columnIndex, ascending) =>
-                  sort<num>((d) => d.calories, columnIndex, ascending),
-            ),
-            DataColumn(
-              label: const Text('Fat (gm)'),
-              numeric: true,
-              onSort: (columnIndex, ascending) =>
-                  sort<num>((d) => d.fat, columnIndex, ascending),
-            ),
-            DataColumn(
-              label: const Text('Carbs (gm)'),
-              numeric: true,
-              onSort: (columnIndex, ascending) =>
-                  sort<num>((d) => d.carbs, columnIndex, ascending),
-            ),
-            DataColumn(
-              label: const Text('Protein (gm)'),
-              numeric: true,
-              onSort: (columnIndex, ascending) =>
-                  sort<num>((d) => d.protein, columnIndex, ascending),
-            ),
-            DataColumn(
-              label: const Text('Sodium (mg)'),
-              numeric: true,
-              onSort: (columnIndex, ascending) =>
-                  sort<num>((d) => d.sodium, columnIndex, ascending),
-            ),
-            DataColumn(
-              label: const Text('Calcium (%)'),
-              numeric: true,
-              onSort: (columnIndex, ascending) =>
-                  sort<num>((d) => d.calcium, columnIndex, ascending),
-            ),
-            DataColumn(
-              label: const Text('Iron (%)'),
-              numeric: true,
-              onSort: (columnIndex, ascending) =>
-                  sort<num>((d) => d.iron, columnIndex, ascending),
-            ),
-          ],
-          source: _dessertsDataSource,
-        ),
-      ],
+    final double evaluatedElevation =
+        elevationTween.evaluate(activationAnimation);
+    final Path path = Path()
+      ..addArc(
+          Rect.fromCenter(
+              center: center, width: 2 * radius, height: 2 * radius),
+          0,
+          pi * 2);
+    canvas.drawShadow(path, Colors.black, evaluatedElevation, true);
+
+    canvas.drawRect(
+      Rect.fromCenter(center: center, width: 2 * radius, height: 2 * radius),
+      Paint()..color = color,
     );
   }
 }

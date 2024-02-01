@@ -5,8 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-String? id;
-
 class SignInController extends GetxController {
   // String? accessToken;
   //String? refreshToken;
@@ -58,8 +56,29 @@ class SignInController extends GetxController {
       // 성공 시 페이지 이동
       Get.offAllNamed('/index'); // 성공 시 이동할 페이지 경로
     } else {
-      print('문제가 발생하였습니다. 관리자에게 문의해주세요.');
+      // 로그인 실패 시 다이얼로그 표시
+      _showLoginFailedDialog();
     }
+  }
+
+  void _showLoginFailedDialog() {
+    showDialog(
+      context: Get.context!, // Getx의 context 사용
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("로그인 실패"),
+          content: Text("아이디 또는 비밀번호가 잘못되었습니다."),
+          actions: <Widget>[
+            TextButton(
+              child: Text("닫기"),
+              onPressed: () {
+                Navigator.of(context).pop(); // 다이얼로그 닫기
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Future<void> saveRefreshToken(String? token) async {
@@ -82,6 +101,16 @@ class SignInController extends GetxController {
     return prefs.getString('access_token');
   }
 
+  Future<void> saveId(int? id) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('id', id ?? -1);
+  }
+
+  Future<int?> getId() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt('id');
+  }
+
   // signIn 메서드 내에서 호출
   Future<bool> signIn(String userId, String password) async {
     try {
@@ -89,14 +118,19 @@ class SignInController extends GetxController {
         'user_id': userId,
         'password': password,
       });
+      print(res.statusCode);
+
       if (res.statusCode == 201) {
         var resData = res.data;
-        await saveRefreshToken(resData['refresh_token']);
-        await saveAccessToken(resData['access_token']);
-        id = resData;
+        print(res.statusCode);
+        var refreshToken = res.data['refresh_token'];
+        saveRefreshToken(refreshToken);
+        var accessToken = res.data['access_token'];
+        saveAccessToken(accessToken);
+
+        saveId(res.data['id']);
         return true;
       }
-      print(res.statusCode);
       return false;
     } on DioException catch (e) {
       print(e.message);

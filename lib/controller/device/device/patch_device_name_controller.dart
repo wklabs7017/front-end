@@ -7,16 +7,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class PatchDeviceController extends GetxController {
+class PatchDeviceNameController extends GetxController {
   int? id;
   String? accessToken;
   final Dio dio = Dio();
 
   TextEditingController nameController = TextEditingController();
 
-  final BASE_URL = '${ApiRoutes.baseUrl}${ApiRoutes.getDevice}';
-
-  var deviceStauts = <Device>[].obs;
+  final BASE_URL = '${ApiRoutes.baseUrl}${ApiRoutes.patchDeviceName}';
 
   @override
   void onInit() {
@@ -30,24 +28,23 @@ class PatchDeviceController extends GetxController {
     id = prefs.getInt('id');
 
     if (accessToken != null && id != null) {
-      callGetDeviceStatus();
+      callPatchDeviceStatus();
     } else {
       print('Access Token or ID is null');
     }
   }
 
-  void callGetDeviceStatus() async {
+  void callPatchDeviceStatus() async {
     try {
-      await patchDeviceStatus(id!, accessToken!, nameController.text);
+      await patchDeviceName(id!, accessToken!, nameController.text);
     } catch (e) {
       print('Error fetching SmartRack status: $e');
     }
   }
 
-  Future<void> patchDeviceStatus(
-      int id, String accessToken, String name) async {
+  Future<void> patchDeviceName(int id, String accessToken, String name) async {
     try {
-      var response = await dio.get(
+      var response = await dio.patch(
         '$BASE_URL?id=$id',
         data: {
           'name': name,
@@ -58,7 +55,7 @@ class PatchDeviceController extends GetxController {
       if (response.statusCode == 201 && response.data != null) {
         print(response.statusCode);
       } else {
-        throw Exception('Failed to load SmartRack status');
+        throw Exception('Failed to patch Device Name.');
       }
     } on DioException catch (e) {
       print('DioException: ${e.message}');

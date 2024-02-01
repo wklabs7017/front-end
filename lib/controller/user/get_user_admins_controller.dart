@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class GetUserAwaitersController extends GetxController {
-  final BASE_URL = '${ApiRoutes.baseUrl}${ApiRoutes.awaiters}';
+class GetUserAdminsController extends GetxController {
+  final BASE_URL = '${ApiRoutes.baseUrl}${ApiRoutes.userAwaiters}';
   final Dio dio = Dio();
   String? accessToken;
 
@@ -26,7 +26,7 @@ class GetUserAwaitersController extends GetxController {
     accessToken = prefs.getString('access_token');
   }
 
-  Future<User?> getUserAwaiters(String? accessToken) async {
+  Future<User?> getUserAdmins(String? accessToken) async {
     if (accessToken == null) return null;
     try {
       final response = await dio.get(

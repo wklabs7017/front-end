@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class GetDeviceSmartRackController extends GetxController {
+class GetDeviceSmartRackStatusController extends GetxController {
   int? id;
   String? accessToken;
   final Dio dio = Dio();

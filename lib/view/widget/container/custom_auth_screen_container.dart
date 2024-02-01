@@ -14,7 +14,7 @@ class CustomAuthScreenContainer extends StatelessWidget {
           width: 60.w,
           height: 300.h,
           decoration: BoxDecoration(
-              color: Colors.black26,
+              color: Colors.white12,
               borderRadius: BorderRadius.circular(10) // 테두리 반경을 10으로 설정
               ),
           child: child),

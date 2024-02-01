@@ -1,53 +1,56 @@
 import 'package:bsn_v2/const/app_colors.dart';
-import 'package:bsn_v2/view/screens/data_table/test.dart';
-import 'package:bsn_v2/view/widget/app_bar/custom_equipment_management_screen_app_bar.dart';
-import 'package:bsn_v2/view/widget/button/custom_task_button.dart';
+import 'package:bsn_v2/view/widget/app_bar/custom_basic_app_bar.dart';
 import 'package:bsn_v2/view/widget/container/custom_basic_container.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import 'package:flutter/material.dart';
+// ... 기타 필요한 import ...
 
 class EquipmentManagementScreen extends StatelessWidget {
   const EquipmentManagementScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    // 화면 너비에 따라 레이아웃을 결정
+    double screenWidth = MediaQuery.of(context).size.width;
+    bool isWideScreen = screenWidth > 600; // 예: 600px 이상을 넓은 화면으로 간주
+
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
-      appBar: CustomEquipmentManagementScreenAppBar(),
-      body: ListView(children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
+      body:
+          isWideScreen ? _buildWideScreenLayout() : _buildNarrowScreenLayout(),
+    );
+  }
+
+  Widget _buildWideScreenLayout() {
+    // 넓은 화면용 레이아웃 (Row 사용)
+    return ListView(
+      children: [
+        SizedBox(height: 30),
+        Row(
           children: [
-            SizedBox(height: 40),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: CustomBasicContainer(
-                  width: 200,
-                  height: 35,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      CustomTaskButton(text: '장비 추가'),
-                      SizedBox(width: 5),
-                      CustomTaskButton(text: '장비 제거'),
-                      SizedBox(width: 5),
-                      CustomTaskButton(text: '장비 선택'),
-                      SizedBox(width: 5),
-                      CustomTaskButton(text: '모두 선택'),
-                      SizedBox(width: 5),
-                    ],
-                  )),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: CustomBasicContainer(
-                width: 390,
-                height: 548,
-                child: PaginatedDataTableDemo(),
-              ),
-            )
+            CustomBasicContainer(width: 110, height: 600),
+            CustomBasicContainer(width: 224, height: 600),
           ],
         ),
-      ]),
+        CustomBasicContainer(width: 224, height: 600),
+      ],
     );
+  }
+
+  Widget _buildNarrowScreenLayout() {
+    // 좁은 화면용 레이아웃 (Column 사용)
+    return ListView(children: [
+      Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: [
+            CustomBasicContainer(width: 350, height: 600),
+            CustomBasicContainer(width: 350, height: 600),
+          ],
+        ),
+      ),
+    ]);
   }
 }

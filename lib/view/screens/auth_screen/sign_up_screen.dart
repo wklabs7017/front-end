@@ -1,23 +1,22 @@
 import 'package:bsn_v2/const/App_colors.dart';
 import 'package:bsn_v2/const/app_text_style.dart';
-import 'package:bsn_v2/controller/auth_controller/sign_up_controller.dart';
-import 'package:bsn_v2/view/widget/alert/custom_basic_alert.dart';
+import 'package:bsn_v2/controller/auth/sign_up_controller.dart';
 import 'package:bsn_v2/view/widget/button/custom_elevated_button.dart';
 import 'package:bsn_v2/view/widget/text_field/custom_text_form_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
-class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({super.key});
+class SignUpScreen extends StatefulWidget {
+  const SignUpScreen({super.key});
 
-  static const String route = '/register';
+  static const String route = '/signUp';
 
   @override
-  State<RegisterScreen> createState() => _RegisterScreenState();
+  State<SignUpScreen> createState() => _SignUpScreenState();
 }
 
-class _RegisterScreenState extends State<RegisterScreen> {
+class _SignUpScreenState extends State<SignUpScreen> {
   @override
   Widget build(BuildContext context) {
     final signUpController = Get.find<SignUpController>();
@@ -97,7 +96,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                         CrossAxisAlignment.center,
                                     children: <Widget>[
                                       CustomTextFormField(
-                                        onFieldSubmitted: (value) {},
                                         maxLength: 10,
                                         controller:
                                             signUpController.nameController,
@@ -107,7 +105,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                       ),
                                       SizedBox(height: 10),
                                       CustomTextFormField(
-                                        onFieldSubmitted: (value) {},
                                         maxLength: 15,
                                         controller:
                                             signUpController.userIdController,
@@ -119,7 +116,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                       ),
                                       SizedBox(height: 10),
                                       CustomTextFormField(
-                                        onFieldSubmitted: (value) {},
                                         maxLength: 30,
                                         controller:
                                             signUpController.emailController,
@@ -130,7 +126,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                             signUpController.emailValidator,
                                       ),
                                       CustomTextFormField(
-                                        onFieldSubmitted: (value) {},
                                         maxLength: 20,
                                         controller:
                                             signUpController.passwordController,
