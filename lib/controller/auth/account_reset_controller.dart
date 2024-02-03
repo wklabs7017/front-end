@@ -45,8 +45,8 @@ class AccountResetController extends GetxController {
 
   void callResetPassword() async {
     try {
-      var success = await resetPassword(
-          id!, accessToken!, emailController.text.toString());
+      var success =
+          await resetPassword(id!, accessToken!, emailController.text);
       if (success) {
         print('Password reset successfully');
       }
@@ -60,13 +60,13 @@ class AccountResetController extends GetxController {
       response = await dio.patch('$BASE_URL',
           options: Options(headers: {'Authorization': 'Bearer $accessToken'}),
           data: {'email': email});
+      print(email);
 
-      if (response.statusCode == 200 || response.statusCode == 204) {
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        print(emailController.text);
+
         print(response.statusCode);
       } else {
-        print(response.statusMessage);
-        print(response.data);
-        print(emailController.text);
         print(id);
       }
       return true;

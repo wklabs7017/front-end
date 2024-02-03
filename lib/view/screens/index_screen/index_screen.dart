@@ -9,7 +9,6 @@ import 'package:bsn_v2/view/screens/index_screen/equipment_control_screen/equipm
 import 'package:bsn_v2/view/screens/index_screen/equipment_control_screen/equipment_device_smart_rack_control_screen.dart';
 import 'package:bsn_v2/view/screens/index_screen/equipment_management_screen.dart';
 import 'package:bsn_v2/view/screens/index_screen/overview_screen.dart';
-import 'package:bsn_v2/view/screens/index_screen/post_tenant_detail_screen.dart';
 import 'package:bsn_v2/view/screens/index_screen/setting_screen.dart';
 import 'package:bsn_v2/view/screens/index_screen/task_management_screen.dart';
 import 'package:bsn_v2/view/screens/index_screen/tenant_screen.dart';

@@ -20,6 +20,7 @@ class GetDeviceCobotController extends GetxController {
   void onInit() {
     super.onInit();
     initializeData();
+    print(filteredDevices.value);
   }
 
   void initializeData() async {
@@ -28,7 +29,7 @@ class GetDeviceCobotController extends GetxController {
     id = prefs.getInt('id');
 
     if (accessToken != null && id != null) {
-      await fetchDevicesInRange(1, 500, accessToken!);
+      await fetchDevicesInRange(1, 50, accessToken!);
     } else {
       print('Access Token or ID is null');
     }
@@ -45,7 +46,7 @@ class GetDeviceCobotController extends GetxController {
           allDevices.add(response);
         }
       } catch (e) {
-        print('Error fetching device status for ID $currentId: $e');
+        print('Error fetching cobot devices status for ID $currentId: $e');
       }
     }
 
@@ -66,10 +67,10 @@ class GetDeviceCobotController extends GetxController {
         if (response.data is Map<String, dynamic>) {
           return Device.fromJson(response.data);
         } else {
-          throw Exception('Failed to load Device status');
+          throw Exception('Failed to load  cobot devices status');
         }
       } else {
-        throw Exception('Failed to load Device status');
+        throw Exception('Failed to load  cobot devices status');
       }
     } catch (e) {
       print('Exception: $e');

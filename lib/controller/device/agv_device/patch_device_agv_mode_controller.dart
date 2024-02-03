@@ -31,6 +31,7 @@ class PatchDeviceAgvModeController extends GetxController {
 
     if (accessToken != null && id != null) {
       callPatchDeviceAgvMode(deviceId);
+      update();
     } else {
       print('Access Token or ID is null');
     }
@@ -55,8 +56,9 @@ class PatchDeviceAgvModeController extends GetxController {
         options: Options(headers: {'Authorization': 'Bearer $accessToken'}),
       );
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200 || response.statusCode == 201) {
         print(response.statusCode);
+        print('mode');
       } else {
         print(response.statusCode);
         throw Exception('Failed to patch Device Name.');

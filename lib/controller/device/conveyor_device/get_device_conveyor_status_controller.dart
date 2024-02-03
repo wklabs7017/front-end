@@ -16,10 +16,13 @@ class GetDeviceConveyorStatusController extends GetxController {
 
   var conveyorStatus = <Conveyor>[].obs;
 
+  var conveyors = <Conveyor>[].obs;
+
   @override
   void onInit() {
     super.onInit();
     initializeData();
+    print(conveyors.value);
   }
 
   void initializeData() async {
@@ -28,41 +31,69 @@ class GetDeviceConveyorStatusController extends GetxController {
     id = prefs.getInt('id');
 
     if (accessToken != null && id != null) {
-      callGetDeviceConveyorStatus();
+      fetchDevicesInRange(1, 50, accessToken!);
     } else {
       print('Access Token or ID is null');
     }
   }
 
-  void callGetDeviceConveyorStatus() async {
-    try {
-      var conveyor = await getDeviceConveyorStatus(id!, accessToken!);
-      conveyorStatus.value = conveyor;
-    } catch (e) {
-      print('Error fetching SmartRack status: $e');
+  Future<RxList<Conveyor>> fetchDevicesInRange(
+      int startId, int endId, String accessToken) async {
+    for (int currentId = startId; currentId <= endId; currentId++) {
+      try {
+        var response = await getDeviceConveyorStatus(currentId, accessToken);
+        if (response.isNotEmpty) {
+          conveyors.addAll(response);
+        }
+      } catch (e) {
+        // 오류 발생 시 해당 ID를 건너뛰고 로그 출력
+        print('Error fetching AGV status for ID $currentId: $e');
+      }
     }
+
+    return conveyors;
   }
 
   Future<List<Conveyor>> getDeviceConveyorStatus(
       int id, String accessToken) async {
     try {
+      // Making a GET request to the API
       var response = await dio.get(
         '$BASE_URL?id=$id',
         options: Options(headers: {'Authorization': 'Bearer $accessToken'}),
       );
 
+      // Checking if the response status code is 200 (OK) and data is not null
       if (response.statusCode == 200 && response.data != null) {
-        print(response.statusCode);
-        List<dynamic> responseData = response.data;
-        return responseData.map((data) => Conveyor.fromJson(data)).toList();
-      } else {
-        throw Exception('Failed to load SmartRack status');
-      }
-    } on DioException catch (e) {
-      print('DioException: ${e.message}');
+        // Initializing an empty list to store Device objects
+        List<Conveyor> conveyorStatus = [];
 
-      throw e;
-    } catch (e) {
+        // If the response data is a Map, it means there is a single device status.
+        // Convert this map to a Device object and add it to the list.
+        if (response.data is Map<String, dynamic>) {
+          conveyorStatus.add(Conveyor.fromJson(response.data));
+        }
+        // If the response data is a List, iterate over it and
+        // convert each item to a Device object and add to the list.
+        else if (response.data is List) {
+          conveyorStatus = (response.data as List)
+              .map<Conveyor>(
+                  (data) => Conveyor.fromJson(data as Map<String, dynamic>))
+              .toList();
+        }
+        // If the data is neither a Map nor a List, throw an exception.
+        else {
+          throw Exception('Failed to load Device status');
+        }
+
+        // Return the list of Device objects
+        return conveyorStatus;
+      } else {
+        throw Exception('Failed to load Device status');
+      }
+    }
+    // Catching any errors and printing them
+    catch (e) {
       print('Exception: $e');
       throw e;
     }

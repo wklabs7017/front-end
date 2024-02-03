@@ -18,9 +18,16 @@ import 'package:bsn_v2/view/widget/etc/user_management_table.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class EquipmentDeviceConveyorControlScreen extends StatelessWidget {
+class EquipmentDeviceConveyorControlScreen extends StatefulWidget {
   EquipmentDeviceConveyorControlScreen({super.key});
 
+  @override
+  State<EquipmentDeviceConveyorControlScreen> createState() =>
+      _EquipmentDeviceConveyorControlScreenState();
+}
+
+class _EquipmentDeviceConveyorControlScreenState
+    extends State<EquipmentDeviceConveyorControlScreen> {
   final getDeviceConveyorController = Get.find<GetDeviceConveyorController>();
 
   final getConveyorController = Get.find<GetDeviceConveyorStatusController>();
@@ -36,6 +43,7 @@ class EquipmentDeviceConveyorControlScreen extends StatelessWidget {
   ];
 
   final List<String> dropdownOptions2 = ['ERROR', 'IDLE', 'RUNNING'];
+
   Widget buildTextField({
     required String label,
     required TextEditingController controller,
@@ -52,6 +60,11 @@ class EquipmentDeviceConveyorControlScreen extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
   }
 
   @override
@@ -299,7 +312,7 @@ class EquipmentDeviceConveyorControlScreen extends StatelessWidget {
               width: screenWidth,
               height: 150,
               child: CustomConveyorStatusDataTable(
-                  conveyors: getConveyorController.conveyorStatus,
+                  conveyors: getConveyorController.conveyors,
                   devices: getDeviceConveyorController.filteredDevices),
             ),
           ],

@@ -1,4 +1,5 @@
 import 'package:bsn_v2/const/api_service/api_routes.dart';
+import 'package:bsn_v2/model/converyor.dart';
 import 'package:bsn_v2/model/smart_rack.dart';
 import 'package:dio/dio.dart';
 import 'package:get/get.dart';
@@ -6,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class GetDeviceSmartRackStatusController extends GetxController {
+class GetDeviceSmartRakckStatusController extends GetxController {
   int? id;
   String? accessToken;
   final Dio dio = Dio();
@@ -15,10 +16,13 @@ class GetDeviceSmartRackStatusController extends GetxController {
 
   var smartRackStatus = <SmartRack>[].obs;
 
+  var smartracks = <SmartRack>[].obs;
+
   @override
   void onInit() {
     super.onInit();
     initializeData();
+    print(smartracks.value);
   }
 
   void initializeData() async {
@@ -27,19 +31,27 @@ class GetDeviceSmartRackStatusController extends GetxController {
     id = prefs.getInt('id');
 
     if (accessToken != null && id != null) {
-      callGetDeviceSmartRackStatus();
+      fetchDevicesInRange(1, 50, accessToken!);
     } else {
       print('Access Token or ID is null');
     }
   }
 
-  void callGetDeviceSmartRackStatus() async {
-    try {
-      var racks = await getDeviceSmartRackStatus(id!, accessToken!);
-      smartRackStatus.value = racks;
-    } catch (e) {
-      print('Error fetching SmartRack status: $e');
+  Future<RxList<SmartRack>> fetchDevicesInRange(
+      int startId, int endId, String accessToken) async {
+    for (int currentId = startId; currentId <= endId; currentId++) {
+      try {
+        var response = await getDeviceSmartRackStatus(currentId, accessToken);
+        if (response.isNotEmpty) {
+          smartracks.addAll(response);
+        }
+      } catch (e) {
+        // 오류 발생 시 해당 ID를 건너뛰고 로그 출력
+        print('Error fetching AGV status for ID $currentId: $e');
+      }
     }
+
+    return smartracks;
   }
 
   Future<List<SmartRack>> getDeviceSmartRackStatus(
@@ -51,17 +63,27 @@ class GetDeviceSmartRackStatusController extends GetxController {
       );
 
       if (response.statusCode == 200 && response.data != null) {
-        print(response.statusCode);
-        List<dynamic> responseData = response.data;
-        return responseData.map((data) => SmartRack.fromJson(data)).toList();
-      } else {
-        throw Exception('Failed to load SmartRack status');
-      }
-    } on DioException catch (e) {
-      print('DioException: ${e.message}');
+        List<SmartRack> smartRackStatus = [];
 
-      throw e;
-    } catch (e) {
+        if (response.data is Map<String, dynamic>) {
+          smartRackStatus.add(SmartRack.fromJson(response.data));
+        } else if (response.data is List) {
+          smartRackStatus = (response.data as List)
+              .map<SmartRack>(
+                  (data) => SmartRack.fromJson(data as Map<String, dynamic>))
+              .toList();
+        } else {
+          throw Exception('Failed to load Device status');
+        }
+
+        // Return the list of Device objects
+        return smartRackStatus;
+      } else {
+        throw Exception('Failed to load Device status');
+      }
+    }
+    // Catching any errors and printing them
+    catch (e) {
       print('Exception: $e');
       throw e;
     }

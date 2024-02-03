@@ -16,6 +16,8 @@ class PatchDeviceConveyorSpeedController extends GetxController {
 
   final BASE_URL = '${ApiRoutes.baseUrl}${ApiRoutes.patchDeviceConveyorSpeed}';
 
+  TextEditingController speedController = TextEditingController();
+
   @override
   void onInit() {
     super.onInit();

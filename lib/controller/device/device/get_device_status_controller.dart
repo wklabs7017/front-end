@@ -31,7 +31,7 @@ class GetDeviceStautsController extends GetxController {
     id = prefs.getInt('id');
 
     if (accessToken != null && id != null) {
-      fetchDevicesInRange(5, 50, accessToken!);
+      fetchDevicesInRange(1, 50, accessToken!);
     } else {
       print('Access Token or ID is null');
     }
@@ -47,7 +47,7 @@ class GetDeviceStautsController extends GetxController {
         }
       } catch (e) {
         // 오류 발생 시 해당 ID를 건너뛰고 로그 출력
-        print('Error fetching AGV status for ID $currentId: $e');
+        print('Error fetching Device status for ID $currentId: $e');
       }
     }
 

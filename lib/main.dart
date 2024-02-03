@@ -102,14 +102,14 @@ class MyApp extends StatelessWidget {
               Get.lazyPut(() => PatchUserTenantController());
 
               //Overview
-              Get.lazyPut(() => GetConsoleLogStautsController());
-              Get.lazyPut(() => GetDeviceStautsController());
+              Get.put(GetConsoleLogStautsController());
+              Get.put(GetDeviceStautsController());
               //Tenant
-              Get.lazyPut(() => GetTenantDetailController());
+              Get.put(GetTenantDetailController());
 
               Get.lazyPut(() => PostTenantDetailController());
               //Manufacturer
-              Get.lazyPut(() => GetManufacturerController());
+              Get.put(GetManufacturerController());
               Get.lazyPut(() => PostManufacturerController());
               //Task
               Get.lazyPut(() => GetDeviceTaskController());
@@ -118,31 +118,32 @@ class MyApp extends StatelessWidget {
               Get.lazyPut(() => DeleteDeviceStautsController());
 
               //AGV
-              Get.lazyPut(() => GetDeviceAgvStatusController());
-              Get.lazyPut(() => GetDeviceAGVController());
+              Get.put(GetDeviceAgvStatusController());
+              Get.put(GetDeviceAGVController());
 
               Get.lazyPut(() => PatchDeviceAgvBatteryLevelController());
               Get.lazyPut(() => PatchDeviceAgvDriveDistanceController());
               Get.lazyPut(() => PatchDeviceAgvModeController());
-              Get.lazyPut(() => PatchDeviceAgvStatusController());
+              Get.put(PatchDeviceAgvStatusController());
               Get.lazyPut(() => PostDeviceAgvStatusController());
               //cobot
-              Get.lazyPut(() => GetDeviceCobotStatusController());
-              Get.lazyPut(() => GetDeviceCobotController());
+              Get.put(GetDeviceCobotStatusController());
+              Get.put(GetDeviceCobotController());
 
               Get.lazyPut(() => PatchDeviceCobotModeController());
               Get.lazyPut(() => PatchDeviceCobotStatusController());
               Get.lazyPut(() => PostDeviceCobotStatusController());
               //Conveyor
-              Get.lazyPut(() => GetDeviceConveyorController());
+              Get.put(GetDeviceConveyorController());
 
-              Get.lazyPut(() => GetDeviceConveyorStatusController());
+              Get.put(GetDeviceConveyorStatusController());
               Get.lazyPut(() => PatchDeviceConveyorSpeedController());
               Get.lazyPut(() => PatchDeviceConveyorStatusController());
               Get.lazyPut(() => PostDeviceConveyorStatusController());
               //Smart_rack
-              Get.lazyPut(() => GetDeviceSmartRackStatusController());
-              Get.lazyPut(() => GetDeviceSmartRackController());
+              Get.put(GetDeviceSmartRackController());
+              Get.put(GetDeviceSmartRackController());
+              Get.lazyPut(() => GetDeviceSmartRakckStatusController());
 
               //Setting
               Get.lazyPut(() => SettingController());

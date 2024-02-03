@@ -10,7 +10,6 @@ import 'package:bsn_v2/controller/user/patch_user_privilege_controller.dart';
 import 'package:bsn_v2/controller/user/patch_user_tenant_controller.dart';
 import 'package:bsn_v2/controller/user/patch_user_user_id_controller.dart';
 import 'package:bsn_v2/model/user.dart';
-import 'package:bsn_v2/view/screens/index_screen/post_tenant_detail_screen.dart';
 import 'package:bsn_v2/view/widget/container/custom_basic_container.dart';
 import 'package:bsn_v2/view/widget/etc/user_management_table.dart';
 import 'package:bsn_v2/view/widget/text_field/custom_edit_profile_elevated_button.dart';

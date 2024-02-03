@@ -19,7 +19,7 @@ class OverviewScreen extends StatelessWidget {
   var getDeviceSmartRackStatus;
 
   final getDeviceSmartRackController =
-      Get.find<GetDeviceSmartRackStatusController>();
+      Get.find<GetDeviceSmartRakckStatusController>();
   final getDeviceController = Get.find<GetDeviceStautsController>();
   final getSystemLogController = Get.find<GetConsoleLogStautsController>();
 

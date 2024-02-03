@@ -20,8 +20,6 @@ class GetTenantDetailController extends GetxController {
   var tenantDetail = <Tenant>[].obs;
   var tenants = <Tenant>[].obs;
 
-  List<Tenant> Tenants = [];
-
   @override
   void onInit() {
     super.onInit();
@@ -34,7 +32,7 @@ class GetTenantDetailController extends GetxController {
     id = prefs.getInt('id');
 
     if (accessToken != null && id != null) {
-      fetchDevicesInRange(5, 50, accessToken!);
+      fetchDevicesInRange(1, 50, accessToken!);
     } else {
       print('Access Token or ID is null');
       print('sdsdsd');

@@ -1,19 +1,23 @@
 class Point {
-  double x;
-  double y;
+  double latitude;
+  double longitude;
 
   Point({
-    required this.x,
-    required this.y,
+    required this.latitude,
+    required this.longitude,
   });
 
-  factory Point.fromJson(Map<String, dynamic> json) => Point(
-        x: json['x'].toDouble(),
-        y: json['y'].toDouble(),
-      );
+  factory Point.fromJson(Map<String, dynamic> json) {
+    return Point(
+      latitude: json['latitude'] as double,
+      longitude: json['longitude'] as double,
+    );
+  }
 
-  Map<String, dynamic> toJson() => {
-        'x': x,
-        'y': y,
-      };
+  Map<String, dynamic> toJson() {
+    return {
+      'latitude': latitude,
+      'longitude': longitude,
+    };
+  }
 }

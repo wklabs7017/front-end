@@ -1,21 +1,21 @@
 import 'dart:math';
 
 import 'package:bsn_v2/const/app_text_style.dart';
+import 'package:bsn_v2/controller/device/agv_device/get_device_agv_status_controller.dart';
 import 'package:bsn_v2/controller/device/agv_device/patch_device_agv_battery_level_controller.dart';
 import 'package:bsn_v2/controller/device/agv_device/patch_device_agv_drive_distance_controller.dart';
 import 'package:bsn_v2/controller/device/agv_device/patch_device_agv_mode_controller.dart';
 import 'package:bsn_v2/controller/device/agv_device/patch_device_agv_status_controller.dart';
 import 'package:bsn_v2/controller/device/device/delete_device_status_controller.dart';
 import 'package:bsn_v2/model/agv.dart';
-import 'package:bsn_v2/model/cobot.dart';
 import 'package:bsn_v2/model/device.dart';
-import 'package:bsn_v2/model/smart_rack.dart';
-import 'package:bsn_v2/view/widget/text_field/custom_deivce_detail_correction_text_filed.dart';
+import 'package:bsn_v2/view/widget/etc/custom_agv_mode_drop_down_box.dart';
+import 'package:bsn_v2/view/widget/etc/custom_agv_status_drop_down_Box.dart';
+
+import 'package:bsn_v2/view/widget/etc/custom_tenant_text_field.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 
 // 나머지 import 문들...
 class CustomAgvStatusDataTable extends StatefulWidget {
@@ -41,6 +41,7 @@ class _CustomAgvStatusDataTableState extends State<CustomAgvStatusDataTable> {
 
   Set<int> selectedRows = Set<int>();
   final deleteDeviceController = Get.find<DeleteDeviceStautsController>();
+  final getDeviceAgvController = Get.find<GetDeviceAgvStatusController>();
 
   var patchAgvBatterLevelController =
       Get.find<PatchDeviceAgvBatteryLevelController>();
@@ -204,84 +205,136 @@ class _CustomAgvStatusDataTableState extends State<CustomAgvStatusDataTable> {
         showDialog(
           context: context,
           builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text('더블클릭 다이얼로그'),
-              content: Column(
-                children: [
-                  Row(
+            return Dialog(
+              backgroundColor: Colors.white,
+              shape:
+                  OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
+              elevation: 0,
+              child: Container(
+                decoration:
+                    BoxDecoration(borderRadius: BorderRadius.circular(20)),
+                width: 700,
+                height: 440,
+                child: AlertDialog(
+                  backgroundColor: Colors.white,
+                  elevation: 0,
+                  title: Column(
                     children: [
-                      Text('장비 ID: ${widget.devices[index].id}'),
-                      Text('장비 이름: ${widget.devices[index].name}'),
+                      Row(
+                        children: [
+                          Spacer(),
+                          IconButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              icon: Icon(Icons.close))
+                        ],
+                      ),
+                      Text(
+                        'AGV 기본 정보 수정',
+                        style: AppTextStyles.bold
+                            .copyWith(color: Color(0xFF232323)),
+                      ),
+                      SizedBox(height: 5),
+                      Text(
+                        '해당 란을 수정하기 위해선 더블 클릭 해주세요.',
+                        style: AppTextStyles.bold
+                            .copyWith(fontSize: 12, color: Colors.red),
+                      ),
                     ],
                   ),
-                  CustomDeviceDetailCorrectiontextField(
-                    controller: patchAgvModeController.modeController,
-                    maxLength: 20,
-                    labelText: 'AGV 모드',
+                  content: Column(
+                    children: [
+                      CustomAGVModeDropDownBox(
+                        label: '현재 모드',
+                        text: '${getDeviceAgvController.agvs[index].mode}',
+                      ),
+                      SizedBox(height: 5),
+                      CustomAGVStatusDropDownBox(
+                        label: '현재 상태',
+                        text: '${getDeviceAgvController.agvs[index].status}',
+                      ),
+                      SizedBox(height: 5),
+                      CustomTenantListTileDetail(
+                        label: '배터리 잔량',
+                        text:
+                            '${getDeviceAgvController.agvs[index].batteryLevel}',
+                        controller: patchAgvBatterLevelController
+                            .batteryLevelController,
+                      ),
+                      SizedBox(height: 5),
+                      CustomTenantListTileDetail(
+                        label: '총 주행거리',
+                        text:
+                            '${getDeviceAgvController.agvs[index].driveDistance}',
+                        controller: patchAgvDriveDistancController
+                            .driveDistanceController,
+                      ),
+                      SizedBox(height: 15),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.grey,
+                              foregroundColor: Colors.white,
+                              minimumSize: Size(120, 45),
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 8),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                            child: Text('수정완료'),
+                            onPressed: () {
+                              patchAgvModeController
+                                  .initializeData(widget.devices[index].id);
+                              patchAgvStatusController
+                                  .initializeData(widget.devices[index].id);
+                              patchAgvDriveDistancController
+                                  .initializeData(widget.devices[index].id);
+                              patchAgvBatterLevelController
+                                  .initializeData(widget.devices[index].id);
+                              selectedRowIndex = null;
+
+                              selectedRows.clear();
+                              Navigator.pop(context); // 다이얼로그 닫기
+                              setState(() {});
+                            },
+                          ),
+                          SizedBox(width: 30),
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.grey,
+                              foregroundColor: Colors.white,
+                              minimumSize: Size(120, 45),
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 8),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                            child: Text('삭제하기'),
+                            onPressed: () {
+                              deleteDeviceController
+                                  .initializeData(widget.devices[index].id);
+                              // 선택된 행 삭제
+                              widget.agvs.removeAt(index);
+                              widget.devices.removeAt(index);
+
+                              // 선택된 행 초기화
+                              selectedRowIndex = null;
+                              selectedRows.clear();
+                              print(index);
+                              Navigator.pop(context);
+                            },
+                          )
+                        ],
+                      )
+                    ],
                   ),
-                  CustomDeviceDetailCorrectiontextField(
-                    controller: patchAgvStatusController.statusController,
-                    maxLength: 20,
-                    labelText: 'AGV 상태',
-                  ),
-                  CustomDeviceDetailCorrectiontextField(
-                    controller:
-                        patchAgvDriveDistancController.driveDistanceController,
-                    maxLength: 20,
-                    labelText: '총 주행거리',
-                  ),
-                  CustomDeviceDetailCorrectiontextField(
-                    controller:
-                        patchAgvBatterLevelController.batteryLevelController,
-                    maxLength: 20,
-                    labelText: '배터리 잔량',
-                  ),
-                ],
+                ),
               ),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    // 수정 확인 버튼을 눌렀을 때 호출되는 함수
-                    patchAgvModeController
-                        .initializeData(widget.devices[index].id);
-                    // patchAgvStatusController
-                    //     .initializeData(widget.devices[index].id);
-                    // patchAgvDriveDistancController
-                    //     .initializeData(widget.devices[index].id);
-                    // patchAgvBatterLevelController
-                    //     .initializeData(widget.devices[index].id);
-
-                    // 선택된 행 초기화
-                    selectedRowIndex = null;
-                    selectedRows.clear();
-                    Navigator.pop(context); // 다이얼로그 닫기
-                  },
-                  child: Text('수정 확인'),
-                ),
-                TextButton(
-                  onPressed: () {
-                    // 삭제 버튼을 눌렀을 때 호출되는 함수
-                    deleteDeviceController
-                        .initializeData(widget.devices[index].id);
-                    // 선택된 행 삭제
-                    widget.agvs.removeAt(index);
-                    widget.devices.removeAt(index);
-
-                    // 선택된 행 초기화
-                    selectedRowIndex = null;
-                    selectedRows.clear();
-                    print(index);
-                    Navigator.pop(context); // 다이얼로그 닫기
-                  },
-                  child: Text('삭제'),
-                ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(context); // 다이얼로그 닫기
-                  },
-                  child: Text('확인'),
-                ),
-              ],
             );
           },
         );

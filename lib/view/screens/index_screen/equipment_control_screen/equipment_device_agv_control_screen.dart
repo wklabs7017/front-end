@@ -94,17 +94,11 @@ class _EquipmentDeviceAgvControlScreenState
       padding: const EdgeInsets.all(8.0),
       child: Row(
         children: [
+          Expanded(flex: 1, child: Text(label)),
           Expanded(
-              flex: 1,
-              child: Text(label, style: AppTextStyles.medium.copyWith())),
-          Expanded(
-              flex: 2,
-              child: Container(
-                  decoration:
-                      BoxDecoration(borderRadius: BorderRadius.circular(20)),
-                  width: 40,
-                  height: 30,
-                  child: NewCustomTextFormField(maxLength: 20))),
+            flex: 2,
+            child: TextField(controller: controller),
+          ),
         ],
       ),
     );
@@ -365,13 +359,6 @@ class _EquipmentDeviceAgvControlScreenState
                                         onPressed: () {
                                           postDeviceAgvController
                                               .initializeData();
-                                          print(postDeviceAgvController
-                                              .modeController.text);
-                                          print(postDeviceAgvController
-                                              .statusController.text);
-                                          print(postDeviceAgvController
-                                              .manufacturerName2Controller
-                                              .text);
                                         },
                                         child: Text('Submit'),
                                       ),
@@ -398,11 +385,12 @@ class _EquipmentDeviceAgvControlScreenState
               ],
             ),
             CustomBasicContainer(
-                width: screenWidth,
-                height: 200.h,
-                child: CustomAgvStatusDataTable(
-                    agvs: getDeviceAgvController.agvs,
-                    devices: getDeviceController.filteredDevices)),
+              width: screenWidth,
+              height: 200.h,
+              child: CustomAgvStatusDataTable(
+                  agvs: getDeviceAgvController.agvs,
+                  devices: getDeviceController.filteredDevices),
+            ),
           ],
         ),
       ),

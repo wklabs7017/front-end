@@ -43,7 +43,7 @@ class CustomDeviceDetailCorrectiontextField extends StatelessWidget {
         validator: validator,
         focusNode: focusNode,
         style: const TextStyle(
-          color: Colors.white, // 사용자 입력 텍스트의 색상을 지정합니다.
+          color: Colors.black, // 사용자 입력 텍스트의 색상을 지정합니다.
           // 여기에 다른 텍스트 스타일 속성을 추가할 수 있습니다.
         ),
         keyboardType: keyboardType,

@@ -30,6 +30,7 @@ class PostDeviceAgvStatusController extends GetxController {
   void onInit() {
     super.onInit();
     initializeData();
+    update();
   }
 
   void initializeData() async {
@@ -39,6 +40,7 @@ class PostDeviceAgvStatusController extends GetxController {
 
     if (accessToken != null && id != null) {
       callPostDeviceAgvStatus();
+      update();
     } else {
       print('Access Token or ID is null');
     }

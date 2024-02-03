@@ -46,7 +46,8 @@ class _EquipmentDeviceCobotControlScreenState
 
   @override
   void initState() {
-    // initState에서 GetX 컨트롤러들을 초기화합니다.
+    // getDeviceCobotController.initializeData();
+    // getDeviceController.initializeData();
   }
 
   Widget buildTextField({
@@ -367,7 +368,7 @@ class _EquipmentDeviceCobotControlScreenState
               height: 150,
               child: CustomCobotStatusDataTable(
                   cobots: getDeviceCobotController.cobots,
-                  devices: getDeviceController.devices),
+                  devices: getDeviceController.filteredDevices),
             ),
           ],
         ),

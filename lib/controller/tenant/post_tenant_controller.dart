@@ -14,20 +14,10 @@ class PostTenantDetailController extends GetxController {
   final Dio dio = Dio();
 
   final nameController = TextEditingController();
-  final xController = TextEditingController();
-  final yController = TextEditingController();
-
-  final points = <Point>[].obs; // Observable 리스트
+  final latitudeController = TextEditingController();
+  final longitudeController = TextEditingController();
 
   final BASE_URL = '${ApiRoutes.baseUrl}${ApiRoutes.postTenant}';
-
-  void addPoint() {
-    double x = double.tryParse(xController.text) ?? 0.0;
-    double y = double.tryParse(yController.text) ?? 0.0;
-    points.add(Point(x: x, y: y));
-    xController.clear();
-    yController.clear();
-  }
 
   void initializeData() async {
     final prefs = await SharedPreferences.getInstance();
@@ -42,16 +32,19 @@ class PostTenantDetailController extends GetxController {
   }
 
   void callPostTenantDetail() async {
+    double latitude = double.tryParse(latitudeController.text) ?? 0.0;
+    double longitude = double.tryParse(longitudeController.text) ?? 0.0;
     try {
       // PostTenantDetail 함수 호출
-      await PostTenantDetail(nameController.text, points, accessToken!);
+      await postTenantDetail(
+          nameController.text, latitude, longitude, accessToken!);
     } catch (e) {
       print('Error creating tenant: $e');
     }
   }
 
-  Future<void> PostTenantDetail(
-      String name, List<Point> points, String accessToken) async {
+  Future<void> postTenantDetail(String name, double latitude, double longitude,
+      String accessToken) async {
     var dio = Dio();
 
     try {
@@ -60,9 +53,7 @@ class PostTenantDetailController extends GetxController {
         options: Options(headers: {'Authorization': 'Bearer $accessToken'}),
         data: {
           'name': name,
-          'area': {
-            'points': points.map((point) => point.toJson()).toList(),
-          },
+          'point': {'latitude': latitude, 'longitude': longitude},
         },
       );
 
@@ -71,14 +62,14 @@ class PostTenantDetailController extends GetxController {
         print('Tenant created successfully.');
       } else {
         // 오류 처리를 여기에 작성합니다.
-        print('Failed to create tenant. Status code: ${response.statusCode} ');
+        print('Failed to create tenant. Status code: ${response.statusCode}');
       }
     } on DioError catch (e) {
       // DioError 처리
       if (e.response != null) {
         // 오류 응답이 있는 경우
-        //print('Dio error: ${e.response!.data}');
-        //print('Status code: ${e.response!.statusCode}');
+        print('Dio error: ${e.response!.data}');
+        print('Status code: ${e.response!.statusCode}');
       } else {
         // 오류 요청이 없는 경우 (요청 오류, 타임아웃 등)
         print('Dio error without response: ${e.message}');

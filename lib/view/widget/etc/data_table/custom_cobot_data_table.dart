@@ -5,11 +5,12 @@ import 'package:bsn_v2/controller/device/agv_device/patch_device_agv_battery_lev
 import 'package:bsn_v2/controller/device/agv_device/patch_device_agv_drive_distance_controller.dart';
 import 'package:bsn_v2/controller/device/agv_device/patch_device_agv_mode_controller.dart';
 import 'package:bsn_v2/controller/device/agv_device/patch_device_agv_status_controller.dart';
-import 'package:bsn_v2/controller/device/cobot_device/patch_device_cobot_mode_controller.dart';
-import 'package:bsn_v2/controller/device/cobot_device/patch_device_cobot_status_controller.dart';
+import 'package:bsn_v2/controller/device/conveyor_device/patch_device_conveyor_speed_controller.dart';
+import 'package:bsn_v2/controller/device/conveyor_device/patch_device_conveyor_status_controller.dart';
 import 'package:bsn_v2/controller/device/device/delete_device_status_controller.dart';
 import 'package:bsn_v2/model/agv.dart';
 import 'package:bsn_v2/model/cobot.dart';
+import 'package:bsn_v2/model/converyor.dart';
 import 'package:bsn_v2/model/device.dart';
 import 'package:bsn_v2/model/smart_rack.dart';
 import 'package:bsn_v2/view/widget/text_field/custom_deivce_detail_correction_text_filed.dart';
@@ -44,8 +45,11 @@ class _CustomCobotStatusDataTableState
 
   Set<int> selectedRows = Set<int>();
   final deleteDeviceController = Get.find<DeleteDeviceStautsController>();
-  var patchCobotModeController = Get.find<PatchDeviceCobotModeController>();
-  var patchCobotStatusController = Get.find<PatchDeviceCobotStatusController>();
+  //
+  // var patchConveyorSpeedController =
+  //     Get.find<PatchDeviceConveyorSpeedController>();
+  // var patchConveyorStatusController =
+  //     Get.find<PatchDeviceConveyorStatusController>();
 
   @override
   Widget build(BuildContext context) {
@@ -66,8 +70,8 @@ class _CustomCobotStatusDataTableState
                     paddedCell('No.', 9, Colors.blue, 0),
                     paddedCell('장비 이름', 9, Colors.blue, 1),
                     paddedCell('연결 상태', 9, Colors.blue, 2),
-                    paddedCell('작동 모드', 9, Colors.blue, 3),
                     paddedCell('현재 상태', 9, Colors.blue, 4),
+                    paddedCell('현재 속도', 9, Colors.blue, 5),
                     paddedCell('마지막 연결 시간', 9, Colors.blue, 7),
                     paddedCell('활동 기록', 9, Colors.blue, 8),
                     paddedCell('정비 기록', 9, Colors.blue, 9),
@@ -96,14 +100,15 @@ class _CustomCobotStatusDataTableState
           paddedCell(widget.devices[i].name, 12, Colors.black, i), // 인덱스 전달
           paddedCell(
               widget.devices[i].modelName, 12, Colors.black, i), // 인덱스 전달
-          paddedCell(widget.cobots[i].mode, 12, Colors.black, i), // 인덱스 전달
           paddedCell(widget.cobots[i].status, 12, Colors.black, i), // 인덱스 전달
+
+          paddedCell(widget.cobots[i].mode, 12, Colors.black, i), // 인덱스 전달
+          paddedCell(widget.cobots[i].mode, 12, Colors.black, i), // 인덱스 전달
 
           paddedCell(widget.devices[i].equippedAt.toString(), 12, Colors.black,
               i), // 인덱스 전달
           paddedCell(widget.devices[i].tenantId.toString(), 12, Colors.black,
               i), // 인덱스 전달
-          paddedCell(widget.devices[i].type, 12, Colors.black, i), // 인덱스 전달
         ],
       ));
     }
@@ -160,8 +165,6 @@ class _CustomCobotStatusDataTableState
         paddedCell(operationStatus2, 12, Colors.black, 5),
         paddedCell(lastConnection2, 12, Colors.black, 6),
         paddedCell(lastConnection3, 12, Colors.black, 7), // 새로운 매개변수 사용
-        paddedCell(lastConnection, 12, Colors.black, 8), // 새로운 매개변수 사용
-        paddedCell(lastConnection3, 12, Colors.black, 9), // 새로운 매개변수 사용
 
         Padding(
           padding: EdgeInsets.all(3.0),
@@ -182,8 +185,6 @@ class _CustomCobotStatusDataTableState
       // 첫 클릭 또는 더블 클릭이 아닌 경우
       setState(() {
         // 선택된 행 초기화 후 현재 클릭한 행만 선택
-        patchCobotModeController.modeController.text =
-            widget.cobots[index].mode;
 
         selectedRows = {index};
       });
@@ -208,26 +209,30 @@ class _CustomCobotStatusDataTableState
                       Text('장비 이름: ${widget.devices[index].name}'),
                     ],
                   ),
-                  CustomDeviceDetailCorrectiontextField(
-                    controller: patchCobotModeController.modeController,
-                    maxLength: 20,
-                    labelText: 'AGV 모드',
-                  ),
-                  CustomDeviceDetailCorrectiontextField(
-                    controller: patchCobotStatusController.statusController,
-                    maxLength: 20,
-                    labelText: 'AGV 상태',
-                  ),
+                  // CustomDeviceDetailCorrectiontextField(
+                  //   controller: patchConveyorStatusController.statusController,
+                  //   maxLength: 20,
+                  //   labelText: '현재 상태',
+                  // ),
+                  // CustomDeviceDetailCorrectiontextField(
+                  //   controller: patchConveyorSpeedController.speedController,
+                  //   maxLength: 20,
+                  //   labelText: '현재 속도',
+                  // ),
                 ],
               ),
               actions: [
                 TextButton(
                   onPressed: () {
                     // 수정 확인 버튼을 눌렀을 때 호출되는 함수
-                    patchCobotModeController
-                        .initializeData(widget.devices[index].id);
-                    patchCobotStatusController
-                        .initializeData(widget.devices[index].id);
+                    //patchAgvModeController
+                    //    .initializeData(widget.devices[index].id);
+                    // patchAgvStatusController
+                    //     .initializeData(widget.devices[index].id);
+                    // patchAgvDriveDistancController
+                    //     .initializeData(widget.devices[index].id);
+                    // patchAgvBatterLevelController
+                    //     .initializeData(widget.devices[index].id);
 
                     // 선택된 행 초기화
                     selectedRowIndex = null;
@@ -239,8 +244,8 @@ class _CustomCobotStatusDataTableState
                 TextButton(
                   onPressed: () {
                     // 삭제 버튼을 눌렀을 때 호출되는 함수
-                    deleteDeviceController
-                        .initializeData(widget.devices[index].id);
+                    //deleteDeviceController
+                    //  .initializeData(widget.devices[index].id);
                     // 선택된 행 삭제
                     widget.cobots.removeAt(index);
                     widget.devices.removeAt(index);
@@ -279,7 +284,7 @@ class _CustomCobotStatusDataTableState
     if (selectedRowIndex != null) {
       setState(() {
         // 삭제 전에 초기화
-        deleteDeviceController.initializeData(widget.devices[index].id);
+        //deleteDeviceController.initializeData(widget.devices[index].id);
 
         print('야야${index}');
 

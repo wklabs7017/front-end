@@ -19,7 +19,7 @@ class EquipmentDeviceSmartRackControlScreen extends StatelessWidget {
   EquipmentDeviceSmartRackControlScreen({super.key});
 
   final getDeviceSmartRackController =
-      Get.find<GetDeviceSmartRackStatusController>();
+      Get.find<GetDeviceSmartRakckStatusController>();
   final getDeviceController = Get.find<GetDeviceSmartRackController>();
 
   @override
@@ -109,7 +109,7 @@ class EquipmentDeviceSmartRackControlScreen extends StatelessWidget {
                 width: screenWidth,
                 height: 150,
                 child: CustomSmartRackStatusDataTable(
-                    smartRacks: getDeviceSmartRackController.smartRackStatus,
+                    smartRacks: getDeviceSmartRackController.smartracks,
                     devices: getDeviceController.filteredDevices)),
           ],
         ),
@@ -186,7 +186,7 @@ class EquipmentDeviceSmartRackControlScreen extends StatelessWidget {
                   width: 350,
                   height: 300,
                   child: CustomSmartRackStatusDataTable(
-                      smartRacks: getDeviceSmartRackController.smartRackStatus,
+                      smartRacks: getDeviceSmartRackController.smartracks,
                       devices: getDeviceController.filteredDevices),
                 ),
               ],

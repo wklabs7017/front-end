@@ -16,33 +16,27 @@ class PatchDeviceAgvBatteryLevelController extends GetxController {
       '${ApiRoutes.baseUrl}${ApiRoutes.patchDeviceAgvBatteryLevel}';
 
   TextEditingController batteryLevelController = TextEditingController();
-
-  @override
-  void onInit() {
-    super.onInit();
-    initializeData();
-  }
-
-  void initializeData() async {
+  void initializeData(int deviceId) async {
     final prefs = await SharedPreferences.getInstance();
     accessToken = prefs.getString('access_token');
     id = prefs.getInt('id');
 
     if (accessToken != null && id != null) {
-      callPatchDeviceAgvBatteryLevel();
+      callPatchDeviceAgvBatteryLevel(deviceId);
+      update();
     } else {
       print('Access Token or ID is null');
     }
   }
 
-  void callPatchDeviceAgvBatteryLevel() async {
+  void callPatchDeviceAgvBatteryLevel(int deviceId) async {
     try {
-      int batteryLevel =
+      int battery_level =
           int.tryParse(batteryLevelController.text) ?? 0; // 기본값으로 0 설정
 
-      await patchDeviceAgvBatteryLevel(id!, accessToken!, batteryLevel);
+      await patchDeviceAgvBatteryLevel(deviceId, accessToken!, battery_level);
     } catch (e) {
-      print('Error fetching SmartRack status: $e');
+      print('Error fetching batter_level status: $e');
     }
   }
 
@@ -56,14 +50,16 @@ class PatchDeviceAgvBatteryLevelController extends GetxController {
         },
         options: Options(headers: {'Authorization': 'Bearer $accessToken'}),
       );
-
-      if (response.statusCode == 201 && response.data != null) {
+      print(response.statusCode);
+      if (response.statusCode == 201 || response.statusCode == 200) {
         print(response.statusCode);
+        print('battery_level');
       } else {
-        throw Exception('Failed to load SmartRack status');
+        throw Exception('Failed to load battery_level status. ');
       }
     } on DioException catch (e) {
       print('DioException: ${e.message}');
+      print('DioException: ${e.response}');
 
       throw e;
     } catch (e) {

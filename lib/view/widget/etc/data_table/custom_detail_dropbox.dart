@@ -2,30 +2,31 @@ import 'package:flutter/material.dart';
 import 'package:bsn_v2/const/App_colors.dart';
 import 'package:bsn_v2/const/app_text_style.dart';
 
-class CustomTenantListTileDetail extends StatefulWidget {
+class CustomDetailDropbox extends StatefulWidget {
   final String label;
   final String text;
 
-  CustomTenantListTileDetail(
-      {Key? key, required this.label, required this.text, this.controller})
-      : super(key: key);
   TextEditingController? controller;
 
+  CustomDetailDropbox(
+      {Key? key, required this.label, required this.text, this.controller})
+      : super(key: key);
+
   @override
-  _CustomTenantListTileDetailState createState() =>
-      _CustomTenantListTileDetailState();
+  _CustomDetailDropboxState createState() => _CustomDetailDropboxState();
 }
 
-class _CustomTenantListTileDetailState
-    extends State<CustomTenantListTileDetail> {
+class _CustomDetailDropboxState extends State<CustomDetailDropbox> {
   bool _isEditing = false;
+
+  TextEditingController? controller;
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
         Expanded(
-          flex: 2,
+          flex: 1,
           child: Container(
               decoration: BoxDecoration(
                   color: Colors.green, borderRadius: BorderRadius.circular(10)),
@@ -41,7 +42,7 @@ class _CustomTenantListTileDetailState
         ),
         SizedBox(width: 5),
         Expanded(
-          flex: 4,
+          flex: 2,
           child: GestureDetector(
             onDoubleTap: () {
               setState(() {
@@ -70,8 +71,8 @@ class _CustomTenantListTileDetailState
                                 borderRadius: BorderRadius.circular(10),
                                 borderSide:
                                     BorderSide(color: Colors.transparent))),
-                        controller: widget.controller,
-                        style: AppTextStyles.medium.copyWith(fontSize: 10),
+                        controller: controller,
+                        style: AppTextStyles.medium.copyWith(fontSize: 13),
                         onSubmitted: (value) {
                           setState(() {
                             _isEditing =
@@ -86,7 +87,7 @@ class _CustomTenantListTileDetailState
                         padding: const EdgeInsets.all(8.0),
                         child: Text(
                           widget.text,
-                          style: AppTextStyles.medium.copyWith(fontSize: 10),
+                          style: AppTextStyles.medium.copyWith(fontSize: 13),
                         ),
                       ),
                     ),

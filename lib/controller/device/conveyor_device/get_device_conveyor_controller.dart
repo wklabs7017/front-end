@@ -28,7 +28,7 @@ class GetDeviceConveyorController extends GetxController {
     id = prefs.getInt('id');
 
     if (accessToken != null && id != null) {
-      await fetchDevicesInRange(5, 50, accessToken!);
+      await fetchDevicesInRange(1, 200, accessToken!);
     } else {
       print('Access Token or ID is null');
     }
@@ -45,7 +45,7 @@ class GetDeviceConveyorController extends GetxController {
           allDevices.add(response);
         }
       } catch (e) {
-        print('Error fetching device status for ID $currentId: $e');
+        print('Error fetching conveyor devices status for ID $currentId: $e');
       }
     }
 
@@ -66,10 +66,10 @@ class GetDeviceConveyorController extends GetxController {
         if (response.data is Map<String, dynamic>) {
           return Device.fromJson(response.data);
         } else {
-          throw Exception('Failed to load Device status');
+          throw Exception('Failed to load  conveyor devices status');
         }
       } else {
-        throw Exception('Failed to load Device status');
+        throw Exception('Failed to load  conveyor devices status');
       }
     } catch (e) {
       print('Exception: $e');

@@ -20,7 +20,14 @@ class GetManufacturerController extends GetxController {
 
   var manufacturerDetail = <Manufacturer>[].obs;
 
-  var manufacturers = <Manufacturer>[].obs;
+  //var manufacturers = <Manufacturer>[].obs;
+
+  var manufacturers = RxList<Manufacturer>();
+
+  void addManufacturer(Manufacturer manufacturer) {
+    manufacturers.add(manufacturer);
+    update(); // Getx 상태 업데이트 함수 호출
+  }
 
   @override
   void onInit() {

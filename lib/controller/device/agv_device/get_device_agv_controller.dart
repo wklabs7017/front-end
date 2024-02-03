@@ -20,6 +20,7 @@ class GetDeviceAGVController extends GetxController {
   void onInit() {
     super.onInit();
     initializeData();
+    update();
   }
 
   void initializeData() async {
@@ -28,7 +29,7 @@ class GetDeviceAGVController extends GetxController {
     id = prefs.getInt('id');
 
     if (accessToken != null && id != null) {
-      await fetchDevicesInRange(5, 50, accessToken!);
+      await fetchDevicesInRange(1, 50, accessToken!);
     } else {
       print('Access Token or ID is null');
     }

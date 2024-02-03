@@ -124,6 +124,8 @@ class _AccountResetScreenState extends State<AccountResetScreen> {
                                                   .validate()) {
                                                 accountResetController
                                                     .initializeData();
+                                                print(accountResetController
+                                                    .emailController.text);
                                                 // showDialog(
                                                 //   context: context,
                                                 //   builder:

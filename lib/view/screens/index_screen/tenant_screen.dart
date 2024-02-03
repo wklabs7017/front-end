@@ -1,9 +1,11 @@
 import 'package:bsn_v2/const/app_text_style.dart';
+import 'package:bsn_v2/controller/canvas_controller.dart';
 import 'package:bsn_v2/controller/manufacturer/get_manufacturer_controller.dart';
 import 'package:bsn_v2/controller/manufacturer/post_manufacturer_controller.dart';
 import 'package:bsn_v2/controller/tenant/get_tenant_controller.dart';
 import 'package:bsn_v2/controller/tenant/post_tenant_controller.dart';
 import 'package:bsn_v2/controller/user/get_user_info_controller.dart';
+import 'package:bsn_v2/model/manufacturer.dart';
 import 'package:bsn_v2/view/widget/etc/custom_manufacturer_text_field.dart';
 
 import 'package:bsn_v2/view/widget/etc/custom_manufacturer_list_tile_detail.dart';
@@ -29,8 +31,6 @@ class _TenantScreenState extends State<TenantScreen> {
   void initState() {
     super.initState();
     // 여기서 초기화 작업 수행
-    getTenantDetailController.initializeData();
-    getManufacturerDetailController.initializeData();
   }
 
   // 데모 데이터 목록
@@ -81,7 +81,7 @@ class _TenantScreenState extends State<TenantScreen> {
                         width: 43
                             .w), // .w 제거, 여기서는 SizedBox의 width에 직접 값을 주는 것이 적절합니다.
                     if (getUserInfoController.userInformation!.privilege !=
-                        'ADMIN') ...[
+                        'AWAITER') ...[
                       IconButton(
                         focusColor: Colors.transparent,
                         hoverColor: Colors.transparent,
@@ -101,7 +101,7 @@ class _TenantScreenState extends State<TenantScreen> {
                                     borderRadius: BorderRadius.circular(20),
                                   ),
                                   width: 600,
-                                  height: 300,
+                                  height: 600,
                                   child: AlertDialog(
                                     elevation: 0,
                                     backgroundColor: Colors.white,
@@ -113,23 +113,106 @@ class _TenantScreenState extends State<TenantScreen> {
                                       ),
                                     ),
                                     content: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Form(
-                                            child: Column(
-                                          children: [
-                                            CustomManufacturerTextField(
-                                              validator: (value) {},
-                                              label: 'Name',
-                                              controller:
-                                                  postTenantDetailController
-                                                      .nameController,
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Form(
+                                            key: _formKey,
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: <Widget>[
+                                                  TextFormField(
+                                                    controller:
+                                                        postTenantDetailController
+                                                            .nameController,
+                                                    decoration: InputDecoration(
+                                                      labelText: 'Name',
+                                                    ),
+                                                    validator: (value) {
+                                                      if (value == null ||
+                                                          value.isEmpty) {
+                                                        return 'Please enter a name';
+                                                      }
+                                                      return null;
+                                                    },
+                                                  ),
+                                                  SizedBox(height: 10),
+                                                  TextFormField(
+                                                    controller:
+                                                        postTenantDetailController
+                                                            .longitudeController,
+                                                    decoration: InputDecoration(
+                                                      labelText: 'X Coordinate',
+                                                    ),
+                                                    keyboardType:
+                                                        TextInputType.number,
+                                                    validator: (value) {
+                                                      if (value == null ||
+                                                          value.isEmpty) {
+                                                        return 'Please enter x coordinate';
+                                                      }
+                                                      return null;
+                                                    },
+                                                  ),
+                                                  TextFormField(
+                                                    controller:
+                                                        postTenantDetailController
+                                                            .latitudeController,
+                                                    decoration: InputDecoration(
+                                                      labelText: 'Y Coordinate',
+                                                    ),
+                                                    keyboardType:
+                                                        TextInputType.number,
+                                                    validator: (value) {
+                                                      if (value == null ||
+                                                          value.isEmpty) {
+                                                        return 'Please enter y coordinate';
+                                                      }
+                                                      return null;
+                                                    },
+                                                  ),
+                                                  SizedBox(height: 20),
+                                                  Center(
+                                                    child: ElevatedButton(
+                                                      onPressed: () {
+                                                        if (_formKey
+                                                            .currentState!
+                                                            .validate()) {
+                                                          // 입력된 좌표값을 정수로 변환
+                                                          int xCoordinate = int.tryParse(
+                                                                  postTenantDetailController
+                                                                      .longitudeController
+                                                                      .text) ??
+                                                              0;
+                                                          int yCoordinate = int.tryParse(
+                                                                  postTenantDetailController
+                                                                      .latitudeController
+                                                                      .text) ??
+                                                              0;
+
+                                                          postTenantDetailController
+                                                              .initializeData();
+                                                          // 여기에서 변환된 좌표값을 사용하여 서버에 요청을 보낼 수 있습니다.
+                                                          print(
+                                                              'Name: ${postTenantDetailController.nameController.text}');
+                                                          print(
+                                                              'X Coordinate: $xCoordinate');
+                                                          print(
+                                                              'Y Coordinate: $yCoordinate');
+                                                          setState(() {});
+                                                        }
+                                                      },
+                                                      child: Text('Submit'),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
                                             ),
-                                            SizedBox(height: 5),
-                                          ],
-                                        ))
-                                      ],
-                                    ),
+                                          ),
+                                        ]),
                                     actions: <Widget>[
                                       Center(
                                         child: Row(
@@ -219,118 +302,119 @@ class _TenantScreenState extends State<TenantScreen> {
                       ),
                       Container(
                         height: 305,
-                        child: ListView.builder(
-                          itemCount: getTenantDetailController.tenants.length,
-                          itemBuilder: (context, index) {
-                            return Padding(
-                              padding: const EdgeInsets.all(5.0),
-                              child: Container(
-                                height: 50,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  border: Border.all(
-                                    width: 1,
-                                    color: AppColors.screenBackgroundColor,
+                        child: Obx(
+                          () => ListView.builder(
+                            itemCount: getTenantDetailController.tenants.length,
+                            itemBuilder: (context, index) {
+                              var tenant =
+                                  getTenantDetailController.tenants[index];
+                              return Padding(
+                                padding: const EdgeInsets.all(5.0),
+                                child: Container(
+                                  height: 50,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(20),
+                                    border: Border.all(
+                                      width: 1,
+                                      color: AppColors.screenBackgroundColor,
+                                    ),
                                   ),
-                                ),
-                                child: ListTile(
-                                  leading: Icon(Icons.settings),
-                                  title: Text(
-                                      '${getTenantDetailController.tenants[index]!.name}'),
-                                  trailing: Icon(Icons.arrow_forward),
-                                  onTap: () {
-                                    showDialog(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        return Dialog(
-                                          backgroundColor: Colors.white,
-                                          shape: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(20)),
-                                          elevation: 0,
-                                          child: Container(
-                                            decoration: BoxDecoration(
+                                  child: InkWell(
+                                    onTap: () {
+                                      showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return Dialog(
+                                            backgroundColor: Colors.white,
+                                            shape: OutlineInputBorder(
                                                 borderRadius:
                                                     BorderRadius.circular(20)),
-                                            width: 500,
-                                            height: 450,
-                                            child: AlertDialog(
-                                              backgroundColor: Colors.white,
-                                              elevation: 0,
-                                              title: Align(
-                                                alignment: AlignmentDirectional
-                                                    .topCenter,
-                                                child: Text(
-                                                    'Tenant ${getTenantDetailController.tenants[index]!.name} 작업 영역'),
+                                            elevation: 0,
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          20)),
+                                              width: 500,
+                                              height: 450,
+                                              child: AlertDialog(
+                                                backgroundColor: Colors.white,
+                                                elevation: 0,
+                                                title: Align(
+                                                  alignment:
+                                                      AlignmentDirectional
+                                                          .topCenter,
+                                                  child: Text(
+                                                      'Tenant ${getTenantDetailController.tenants[index]!.name} 작업 영역'),
+                                                ),
+                                                content: SingleChildScrollView(
+                                                  child: ListBody(
+                                                    children: <Widget>[
+                                                      CustomTenantListTileDetail(
+                                                          label: 'TenantId',
+                                                          text:
+                                                              '${getTenantDetailController.tenants[index]!.id}'),
+                                                      SizedBox(height: 5),
+                                                      CustomTenantListTileDetail(
+                                                          label: 'Area',
+                                                          text:
+                                                              'x: ${getTenantDetailController.tenants[index].point.latitude}, y: ${getTenantDetailController.tenants[index]!.point.longitude}'),
+                                                      SizedBox(height: 5),
+                                                      CustomTenantListTileDetail(
+                                                          label: 'Devices',
+                                                          text:
+                                                              '${getTenantDetailController.tenants[index]!.devices.isEmpty ? 'Not detected' : null}'),
+                                                      SizedBox(height: 5),
+                                                      CustomTenantListTileDetail(
+                                                          label: 'Workers',
+                                                          text:
+                                                              '${getTenantDetailController.tenants[index]!.workers.isEmpty ? 'Not detected' : null}'),
+                                                      SizedBox(height: 5),
+                                                      CustomTenantListTileDetail(
+                                                          label: 'createdAt',
+                                                          text:
+                                                              '${getTenantDetailController.tenants[index]!.createdAt}'),
+                                                      SizedBox(height: 5),
+                                                      CustomTenantListTileDetail(
+                                                          label: 'deletedAt',
+                                                          text:
+                                                              '${getTenantDetailController.tenants[index]!.deletedAt ?? 'Not applicable'}: null}'),
+                                                    ],
+                                                  ),
+                                                ),
+                                                actions: <Widget>[
+                                                  TextButton(
+                                                    child: Text('취소'),
+                                                    onPressed: () {
+                                                      Navigator.of(context)
+                                                          .pop(); // 대화상자를 닫습니다
+                                                    },
+                                                  ),
+                                                  TextButton(
+                                                    child: Text('확인'),
+                                                    onPressed: () {
+                                                      // 확인 버튼이 눌렸을 때 수행할 작업
+                                                      Navigator.of(context)
+                                                          .pop(); // 대화상자를 닫습니다
+                                                    },
+                                                  ),
+                                                ],
                                               ),
-                                              content: SingleChildScrollView(
-                                                child: ListBody(
-                                                  children: <Widget>[
-                                                    CustomTenantListTileDetail(
-                                                        label: 'TenantId',
-                                                        text:
-                                                            '${getTenantDetailController.tenants[index]!.id}'),
-                                                    SizedBox(height: 5),
-                                                    CustomTenantListTileDetail(
-                                                      label: 'Area',
-                                                      text: getTenantDetailController
-                                                              .tenants[index]!
-                                                              .area
-                                                              .points
-                                                              .isNotEmpty
-                                                          ? 'x: ${getTenantDetailController.tenants[index]!.area.points[0].x}, y: ${getTenantDetailController.tenants[index]!.area.points[0].y}'
-                                                          : 'No Points Available',
-                                                    ),
-                                                    SizedBox(height: 5),
-                                                    CustomTenantListTileDetail(
-                                                        label: 'Devices',
-                                                        text:
-                                                            '${getTenantDetailController.tenants[index]!.devices.isEmpty ? 'Not detected' : null}'),
-                                                    SizedBox(height: 5),
-                                                    CustomTenantListTileDetail(
-                                                        label: 'Workers',
-                                                        text:
-                                                            '${getTenantDetailController.tenants[index]!.workers.isEmpty ? 'Not detected' : null}'),
-                                                    SizedBox(height: 5),
-                                                    CustomTenantListTileDetail(
-                                                        label: 'createdAt',
-                                                        text:
-                                                            '${getTenantDetailController.tenants[index]!.createdAt}'),
-                                                    SizedBox(height: 5),
-                                                    CustomTenantListTileDetail(
-                                                        label: 'deletedAt',
-                                                        text:
-                                                            '${getTenantDetailController.tenants[index]!.deletedAt.isEmpty ? 'Not applicable' : null}'),
-                                                  ],
-                                                ),
-                                              ),
-                                              actions: <Widget>[
-                                                TextButton(
-                                                  child: Text('취소'),
-                                                  onPressed: () {
-                                                    Navigator.of(context)
-                                                        .pop(); // 대화상자를 닫습니다
-                                                  },
-                                                ),
-                                                TextButton(
-                                                  child: Text('확인'),
-                                                  onPressed: () {
-                                                    // 확인 버튼이 눌렸을 때 수행할 작업
-                                                    Navigator.of(context)
-                                                        .pop(); // 대화상자를 닫습니다
-                                                  },
-                                                ),
-                                              ],
                                             ),
-                                          ),
-                                        );
-                                      },
-                                    );
-                                  },
+                                          );
+                                        },
+                                      );
+                                    },
+                                    child: ListTile(
+                                      leading: Text('${tenant.name}'),
+                                      title: Text('}'),
+                                      trailing: Icon(Icons.arrow_forward),
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            );
-                          },
+                              );
+                            },
+                          ),
                         ),
                       )
                     ],
@@ -345,7 +429,7 @@ class _TenantScreenState extends State<TenantScreen> {
                         width: 25
                             .w), // .w 제거, 여기서는 SizedBox의 width에 직접 값을 주는 것이 적절합니다.
                     if (getUserInfoController.userInformation!.privilege !=
-                        'ADMIN') ...[
+                        'AWAITER') ...[
                       IconButton(
                         focusColor: Colors.transparent,
                         hoverColor: Colors.transparent,
@@ -442,8 +526,18 @@ class _TenantScreenState extends State<TenantScreen> {
                                               onPressed: () {
                                                 if (_formKey.currentState!
                                                     .validate()) {
+                                                  getManufacturerDetailController
+                                                      .addManufacturer(Manufacturer(
+                                                          name:
+                                                              '${postManufacturerDetailController.nameController.text}',
+                                                          contact:
+                                                              '${postManufacturerDetailController.contactController.text}'));
+
                                                   postManufacturerDetailController
                                                       .initializeData();
+                                                  setState(() {});
+                                                  Navigator.of(context)
+                                                      .pop(); // 대화상자 닫기
                                                 }
                                               },
                                             ),
@@ -460,9 +554,7 @@ class _TenantScreenState extends State<TenantScreen> {
                         icon: Icon(Icons.add, size: 20, color: Colors.grey),
                       ),
                       IconButton(
-                        onPressed: () {
-                          // '삭제' 버튼 눌렀을 때 실행할 코드
-                        },
+                        onPressed: () {},
                         icon: Icon(Icons.delete, size: 20, color: Colors.grey),
                       ),
                       SizedBox(width: 5),
@@ -489,31 +581,35 @@ class _TenantScreenState extends State<TenantScreen> {
                       ),
                       Container(
                         height: 300,
-                        child: ListView.builder(
-                          itemCount: getManufacturerDetailController
-                              .manufacturers.length,
-                          itemBuilder: (context, index) {
-                            return Padding(
-                              padding: const EdgeInsets.all(5.0),
-                              child: Container(
-                                height: 50,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(20),
-                                  border: Border.all(
-                                    width: 1,
-                                    color: AppColors.screenBackgroundColor,
+                        child: Obx(
+                          () => ListView.builder(
+                            itemCount: getManufacturerDetailController
+                                .manufacturers.length,
+                            itemBuilder: (context, index) {
+                              var manufacturer = getManufacturerDetailController
+                                  .manufacturers[index];
+                              return Padding(
+                                padding: const EdgeInsets.all(5.0),
+                                child: Container(
+                                  height: 50,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(20),
+                                    border: Border.all(
+                                      width: 1,
+                                      color: AppColors.screenBackgroundColor,
+                                    ),
+                                  ),
+                                  child: ListTile(
+                                    leading: Text(
+                                        '${getManufacturerDetailController.manufacturers[index].name}'),
+                                    title: Text(
+                                        '${getManufacturerDetailController.manufacturers[index].contact}'),
+                                    trailing: Icon(Icons.arrow_forward),
                                   ),
                                 ),
-                                child: ListTile(
-                                  leading: Text(
-                                      '${getManufacturerDetailController.manufacturers[index].name}'),
-                                  title: Text(
-                                      '${getManufacturerDetailController.manufacturers[index].name}'),
-                                  trailing: Icon(Icons.arrow_forward),
-                                ),
-                              ),
-                            );
-                          },
+                              );
+                            },
+                          ),
                         ),
                       )
                     ],
