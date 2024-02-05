@@ -45,11 +45,12 @@ import 'package:bsn_v2/controller/work/get_work_log_controller.dart';
 import 'package:bsn_v2/view/screens/auth_screen/account_reset_screen.dart';
 
 import 'package:bsn_v2/view/screens/auth_screen/sign_in_screen.dart';
-import 'package:bsn_v2/view/screens/index_screen/equipment_control_screen.dart';
-import 'package:bsn_v2/view/screens/index_screen/equipment_management_screen.dart';
-import 'package:bsn_v2/view/screens/index_screen/index_screen.dart';
-import 'package:bsn_v2/view/screens/index_screen/overview_screen.dart';
-import 'package:bsn_v2/view/screens/index_screen/setting_screen.dart';
+import 'dart:io'; // Platform 클래스 사용을 위해 필요
+import 'package:flutter/foundation.dart' show kIsWeb; // kIsWeb을 사용하기 위해 필요
+import 'package:flutter/material.dart';
+import 'package:window_size/window_size.dart'
+    as window_size; // 윈도우 크기를 설정하기 위해 추가
+
 import 'package:bsn_v2/view/screens/index_screen/task_management_screen.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -61,21 +62,7 @@ import 'package:get/get_navigation/src/root/get_material_app.dart';
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // 윈도우 앱의 최소 크기 설정
-
-  if (Platform.isWindows) {
-    window_size.getWindowInfo().then((window) {
-      if (window.screen != null) {
-        const width = 1600.0;
-        const height = 900.0;
-        window_size.setWindowMinSize(const Size(width, height));
-      } else {
-        return null;
-      }
-    });
-  }
-
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {

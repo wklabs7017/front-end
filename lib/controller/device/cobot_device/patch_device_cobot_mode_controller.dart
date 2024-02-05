@@ -25,15 +25,17 @@ class PatchDeviceCobotModeController extends GetxController {
     super.onInit();
   }
 
-  void initializeData(int deviceId) async {
+  Future<bool> initializeData(int deviceId) async {
     final prefs = await SharedPreferences.getInstance();
     accessToken = prefs.getString('access_token');
     id = prefs.getInt('id');
 
     if (accessToken != null && id != null) {
       callPatchDeviceCobotMode(deviceId);
+      return true;
     } else {
       print('Access Token or ID is null');
+      return false;
     }
   }
 
@@ -45,7 +47,7 @@ class PatchDeviceCobotModeController extends GetxController {
     }
   }
 
-  Future<void> patchDeviceCobotMode(
+  Future<bool?> patchDeviceCobotMode(
       int id, String accessToken, String mode) async {
     try {
       var response = await dio.patch(
@@ -56,8 +58,9 @@ class PatchDeviceCobotModeController extends GetxController {
         options: Options(headers: {'Authorization': 'Bearer $accessToken'}),
       );
 
-      if (response.statusCode == 200 && response.data != null) {
+      if (response.statusCode == 200 || response.statusCode == 201) {
         print(response.statusCode);
+        return true;
       } else {
         print(response.statusCode);
         throw Exception('Failed to patch Device Name.');

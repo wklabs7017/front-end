@@ -1,6 +1,6 @@
 class AGV {
   final String status;
-  final String mode;
+  String mode;
   final int batteryLevel;
   final int driveDistance;
 

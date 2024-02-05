@@ -16,27 +16,22 @@ class PatchDeviceConveyorStatusController extends GetxController {
 
   final BASE_URL = '${ApiRoutes.baseUrl}${ApiRoutes.patchDeviceConveyorStatus}';
 
-  @override
-  void onInit() {
-    super.onInit();
-    initializeData();
-  }
-
-  void initializeData() async {
+  void initializeData(int deviceId) async {
     final prefs = await SharedPreferences.getInstance();
     accessToken = prefs.getString('access_token');
     id = prefs.getInt('id');
 
     if (accessToken != null && id != null) {
-      callPatchDeviceConveyorStatus();
+      callPatchDeviceConveyorStatus(deviceId);
     } else {
       print('Access Token or ID is null');
     }
   }
 
-  void callPatchDeviceConveyorStatus() async {
+  void callPatchDeviceConveyorStatus(int deviceId) async {
     try {
-      await patchDeviceConveyorStatus(id!, accessToken!, statusController.text);
+      await patchDeviceConveyorStatus(
+          deviceId!, accessToken!, statusController.text);
     } catch (e) {
       print('Error fetching SmartRack status: $e');
     }
@@ -53,7 +48,7 @@ class PatchDeviceConveyorStatusController extends GetxController {
         options: Options(headers: {'Authorization': 'Bearer $accessToken'}),
       );
 
-      if (response.statusCode == 201 && response.data != null) {
+      if (response.statusCode == 201 || response.statusCode == 200) {
         print(response.statusCode);
       } else {
         throw Exception('Failed to load SmartRack status');

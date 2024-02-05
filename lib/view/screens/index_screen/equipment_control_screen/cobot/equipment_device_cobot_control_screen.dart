@@ -8,12 +8,16 @@ import 'package:bsn_v2/controller/device/device/delete_device_status_controller.
 import 'package:bsn_v2/controller/device/device/get_device_status_controller.dart';
 import 'package:bsn_v2/controller/device/smart_rack_device/smart_rack/get_device_smart_rack_status_controller.dart';
 import 'package:bsn_v2/model/smart_rack.dart';
+import 'package:bsn_v2/view/screens/index_screen/equipment_control_screen/cobot/customCOBOTmodeDropDownBox123.dart';
+import 'package:bsn_v2/view/screens/index_screen/equipment_control_screen/cobot/customCOBOTstatusDropDownBox123.dart';
 import 'package:bsn_v2/view/widget/button/custom_default_control_container.dart';
 import 'package:bsn_v2/view/widget/button/custom_device_switch_button.dart';
 import 'package:bsn_v2/view/widget/button/custom_task_button.dart';
 import 'package:bsn_v2/view/widget/container/custom_basic_container.dart';
 import 'package:bsn_v2/view/widget/app_bar/custom_overview_screen_app_bar.dart';
-import 'package:bsn_v2/view/widget/etc/data_table/custom_cobot_data_table.dart';
+
+import 'package:bsn_v2/view/widget/etc/custom_decoration_text_field.dart';
+import 'package:bsn_v2/view/widget/etc/data_table/cobot/custom_cobot_data_table.dart';
 import 'package:bsn_v2/view/widget/etc/data_table/custom_overview_smart_rack_data_table.dart';
 import 'package:bsn_v2/view/widget/etc/custom_device_status_table.dart';
 import 'package:bsn_v2/view/widget/etc/custom_velocity_control_pannel.dart';
@@ -220,139 +224,96 @@ class _EquipmentDeviceCobotControlScreenState
                 CustomMiniTaskButton(
                     onTap: () {
                       showDialog(
-                        context: Get.context!,
+                        context: context,
                         builder: (BuildContext context) {
-                          return AlertDialog(
-                            title: Text('더블클릭 다이얼로그'),
-                            content: Column(
-                              children: [
-                                buildTextField(
-                                  label: 'Name:',
-                                  controller:
-                                      postDeviceCobotController.nameController,
-                                ),
-                                buildTextField(
-                                  label: 'modelName:',
-                                  controller: postDeviceCobotController
-                                      .modelNameController,
-                                ),
-                                GestureDetector(
-                                  onTap: () async {
-                                    DateTime? pickedDate = await showDatePicker(
-                                      context: context,
-                                      initialDate: postDeviceCobotController
-                                              .equippedAt ??
-                                          DateTime.now(),
-                                      firstDate: DateTime(2022),
-                                      lastDate: DateTime(2025),
-                                    );
-
-                                    if (pickedDate != null) {
-                                      TimeOfDay? pickedTime =
-                                          await showTimePicker(
-                                        context: context,
-                                        initialTime: TimeOfDay.fromDateTime(
-                                          postDeviceCobotController
-                                                  .equippedAt ??
-                                              DateTime.now(),
+                          return Theme(
+                            data: Theme.of(context).copyWith(
+                              dialogBackgroundColor: AppColors.backgroundColor,
+                            ), // 다이얼로그 배경색을 흰색으로 오버라이드
+                            child: Dialog(
+                              shape: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(20)),
+                              elevation: 0,
+                              backgroundColor: Colors.white,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(20)),
+                                width: 700,
+                                height: 500,
+                                child: AlertDialog(
+                                  elevation: 0,
+                                  backgroundColor: Colors.white,
+                                  title: Column(
+                                    children: [
+                                      Container(
+                                        child: Row(
+                                          children: [
+                                            Spacer(),
+                                            IconButton(
+                                                onPressed: () {
+                                                  Navigator.pop(context);
+                                                },
+                                                icon: Icon(Icons.close)),
+                                          ],
                                         ),
-                                      );
-
-                                      if (pickedTime != null) {
-                                        postDeviceCobotController.equippedAt =
-                                            DateTime(
-                                          pickedDate.year,
-                                          pickedDate.month,
-                                          pickedDate.day,
-                                          pickedTime.hour,
-                                          pickedTime.minute,
-                                        );
-                                      }
-                                    }
-                                  },
-                                  child: buildTextField(
-                                    label: 'equipped_at:',
-                                    controller: TextEditingController(
-                                      text: postDeviceCobotController.equippedAt
-                                              ?.toString() ??
-                                          '',
-                                    ),
+                                      ),
+                                      Center(
+                                          child: Text('AGV 장비 추가',
+                                              style: AppTextStyles.bold
+                                                  .copyWith(fontSize: 30))),
+                                    ],
                                   ),
-                                ),
-                                buildTextField(
-                                  label: 'manufactruer_Name:',
-                                  controller: postDeviceCobotController
-                                      .manufacturerNameController,
-                                ),
-                                buildTextField(
-                                  label: 'tenant_id:',
-                                  controller: postDeviceCobotController
-                                      .tenantIdController,
-                                ),
-                                DropdownButtonFormField<String>(
-                                  decoration: InputDecoration(
-                                    labelText: 'Select Mode',
-                                    // Add any additional styling or decoration as needed
-                                  ),
-                                  value: dropdownOptions2.contains(
+                                  content: Column(
+                                    children: [
+                                      CustomCobotModeDropDownBox123(
+                                          label: '모드'),
+                                      CustomCobotStatusDropDownBox123(
+                                          label: '상태'),
+                                      CustomDecorationTextField(
+                                          label: 'name',
+                                          controller: postDeviceCobotController
+                                              .nameController),
+                                      SizedBox(height: 5),
+                                      CustomDecorationTextField(
+                                          label: 'model name',
+                                          controller: postDeviceCobotController
+                                              .modelNameController),
+                                      SizedBox(height: 5),
+                                      CustomDecorationTextField(
+                                          label: 'Manufacturer name',
+                                          controller: postDeviceCobotController
+                                              .manufacturerNameController),
+                                      SizedBox(height: 5),
+                                      CustomDecorationTextField(
+                                          label: 'Tenant Id',
+                                          controller: postDeviceCobotController
+                                              .tenantIdController),
+                                      SizedBox(height: 5),
+                                      SizedBox(height: 10),
+                                      ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.grey,
+                                          foregroundColor: Colors.white,
+                                          minimumSize: Size(120, 45),
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 80, vertical: 8),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                          ),
+                                        ),
+                                        child: Text('장비 추가'),
+                                        onPressed: () {
                                           postDeviceCobotController
-                                              .statusController.text)
-                                      ? postDeviceCobotController
-                                          .statusController.text
-                                      : null,
-                                  items: dropdownOptions2.map((String value) {
-                                    return DropdownMenuItem<String>(
-                                      value: value,
-                                      child: Text(value),
-                                    );
-                                  }).toList(),
-                                  onChanged: (String? newValue) {
-                                    if (newValue != null) {
-                                      postDeviceCobotController
-                                          .statusController.text = newValue;
-                                    }
-                                  },
-                                ),
-                                DropdownButtonFormField<String>(
-                                  decoration: InputDecoration(
-                                    labelText: 'Select Mode',
-                                    // Add any additional styling or decoration as needed
+                                              .initializeData();
+                                          Navigator.pop(context);
+                                        },
+                                      ),
+                                    ],
                                   ),
-                                  value: dropdownOptions1.contains(
-                                          postDeviceCobotController
-                                              .modeController.text)
-                                      ? postDeviceCobotController
-                                          .modeController.text
-                                      : null,
-                                  items: dropdownOptions1.map((String value) {
-                                    return DropdownMenuItem<String>(
-                                      value: value,
-                                      child: Text(value),
-                                    );
-                                  }).toList(),
-                                  onChanged: (String? newValue) {
-                                    if (newValue != null) {
-                                      postDeviceCobotController
-                                          .modeController.text = newValue;
-                                    }
-                                  },
                                 ),
-                                ElevatedButton(
-                                  onPressed: () {
-                                    postDeviceCobotController.initializeData();
-                                  },
-                                  child: Text('Submit'),
-                                ),
-                              ],
-                            ),
-                            actions: [
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.pop(context); // 다이얼로그 닫기
-                                },
-                                child: Text('확인'),
                               ),
-                            ],
+                            ),
                           );
                         },
                       );

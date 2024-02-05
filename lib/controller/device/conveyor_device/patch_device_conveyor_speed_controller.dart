@@ -18,27 +18,21 @@ class PatchDeviceConveyorSpeedController extends GetxController {
 
   TextEditingController speedController = TextEditingController();
 
-  @override
-  void onInit() {
-    super.onInit();
-    initializeData();
-  }
-
-  void initializeData() async {
+  void initializeData(int deviceId) async {
     final prefs = await SharedPreferences.getInstance();
     accessToken = prefs.getString('access_token');
     id = prefs.getInt('id');
 
     if (accessToken != null && id != null) {
-      callPatchConveyorSpeed();
+      callPatchConveyorSpeed(deviceId);
     } else {
       print('Access Token or ID is null');
     }
   }
 
-  void callPatchConveyorSpeed() async {
+  void callPatchConveyorSpeed(int deviceId) async {
     try {
-      await patchConveyorSpeed(id!, accessToken!, speed);
+      await patchConveyorSpeed(deviceId!, accessToken!, speed);
     } catch (e) {
       print('Error fetching SmartRack status: $e');
     }
@@ -54,7 +48,7 @@ class PatchDeviceConveyorSpeedController extends GetxController {
         options: Options(headers: {'Authorization': 'Bearer $accessToken'}),
       );
 
-      if (response.statusCode == 201 && response.data != null) {
+      if (response.statusCode == 201 || response.statusCode == 200) {
         print(response.statusCode);
       } else {
         throw Exception('Failed to load SmartRack status');

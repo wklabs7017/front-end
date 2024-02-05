@@ -34,7 +34,9 @@ class PatchDeviceAgvBatteryLevelController extends GetxController {
       int battery_level =
           int.tryParse(batteryLevelController.text) ?? 0; // 기본값으로 0 설정
 
-      await patchDeviceAgvBatteryLevel(deviceId, accessToken!, battery_level);
+// 이부분
+      await patchDeviceAgvBatteryLevel(deviceId, accessToken!, battery_level)
+          .then((value) => update());
     } catch (e) {
       print('Error fetching batter_level status: $e');
     }

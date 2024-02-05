@@ -1,35 +1,35 @@
 import 'package:bsn_v2/const/app_text_style.dart';
 import 'package:bsn_v2/controller/device/agv_device/get_device_agv_status_controller.dart';
 import 'package:bsn_v2/controller/device/agv_device/patch_device_agv_mode_controller.dart';
-import 'package:bsn_v2/controller/device/agv_device/patch_device_agv_status_controller.dart';
+import 'package:bsn_v2/controller/device/agv_device/post_device_agv_status_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:bsn_v2/const/app_colors.dart';
 import 'package:get/get.dart';
 
-class CustomAGVStatusDropDownBox extends StatefulWidget {
+class CustomAGVModeDropDownBox123 extends StatefulWidget {
   final String label;
-  final String text; // 이제 text는 초기 선택된 값으로 사용됩니다.
+  final String? text; // 이제 text는 초기 선택된 값으로 사용됩니다.
 
-  CustomAGVStatusDropDownBox({
+  CustomAGVModeDropDownBox123({
     Key? key,
     required this.label,
-    required this.text,
+    this.text,
   }) : super(key: key);
 
   @override
-  _CustomAGVStatusDropDownBoxState createState() =>
-      _CustomAGVStatusDropDownBoxState();
+  _CustomAGVModeDropDownBox123State createState() =>
+      _CustomAGVModeDropDownBox123State();
 }
 
-class _CustomAGVStatusDropDownBoxState
-    extends State<CustomAGVStatusDropDownBox> {
-  var patchController = Get.find<PatchDeviceAgvStatusController>();
-  var getController = Get.find<GetDeviceAgvStatusController>();
+var postController = Get.find<PostDeviceAgvStatusController>();
+var getController = Get.find<GetDeviceAgvStatusController>();
 
+class _CustomAGVModeDropDownBox123State
+    extends State<CustomAGVModeDropDownBox123> {
   bool _isEditing = false;
   String? _selectedValue;
 
-  final List<String> dropdownOptions2 = ['ERROR', 'IDLE', 'RUNNING'];
+  final List<String> dropdownOptions2 = ['AUTO', 'MANUAL'];
 
   @override
   void initState() {
@@ -94,8 +94,8 @@ class _CustomAGVStatusDropDownBoxState
                           .copyWith(color: Colors.black), // 선택된 항목의 스타일 설정
 
                       value: dropdownOptions2
-                              .contains(patchController.statusController.text)
-                          ? patchController.statusController.text
+                              .contains(postController.modeController.text)
+                          ? postController.modeController.text
                           : null,
                       items: dropdownOptions2.map((String value) {
                         return DropdownMenuItem<String>(
@@ -109,7 +109,7 @@ class _CustomAGVStatusDropDownBoxState
                       }).toList(),
                       onChanged: (String? newValue) {
                         if (newValue != null) {
-                          patchController.statusController.text = newValue;
+                          postController.modeController.text = newValue;
                         }
                       },
                     )

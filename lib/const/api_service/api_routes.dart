@@ -6,21 +6,14 @@ class ApiRoutes {
   static const String signIn = '/api/auth/signin';
   static const String refresh = '/api/auth/refresh';
 
-  static const String passwordReset = '/api/user/password/reset';
-
   //user
   static const String user = '/api/user';
-
-  static const String userAwaiters = '/api/user/awaiters';
-
-  static const String userAdmins = '/api/user/admins';
-
-  static const String userEmployess = '/api/user/employess';
 
   static const String userList = '/api/user/list';
 
   static const String userId = '/api/user/user_id';
   static const String userPassword = '/api/user/password';
+  static const String userPasswordReset = '/api/user/password/reset';
   static const String userEmail = '/api/user/email';
   static const String userTenant = '/api/user/userTenant';
   static const String userPrivilege = '/api/user/privilege';

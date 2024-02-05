@@ -9,8 +9,8 @@ import 'package:bsn_v2/controller/device/agv_device/patch_device_agv_status_cont
 import 'package:bsn_v2/controller/device/device/delete_device_status_controller.dart';
 import 'package:bsn_v2/model/agv.dart';
 import 'package:bsn_v2/model/device.dart';
-import 'package:bsn_v2/view/widget/etc/custom_agv_mode_drop_down_box.dart';
-import 'package:bsn_v2/view/widget/etc/custom_agv_status_drop_down_Box.dart';
+import 'package:bsn_v2/view/widget/etc/data_table/AGV/customAGVmodeDropDownBox456.dart';
+import 'package:bsn_v2/view/widget/etc/data_table/AGV/customAGVstatusDropDownBox456.dart.dart.';
 
 import 'package:bsn_v2/view/widget/etc/custom_tenant_text_field.dart';
 import 'package:flutter/cupertino.dart';
@@ -49,6 +49,34 @@ class _CustomAgvStatusDataTableState extends State<CustomAgvStatusDataTable> {
       Get.find<PatchDeviceAgvDriveDistanceController>();
   var patchAgvModeController = Get.find<PatchDeviceAgvModeController>();
   var patchAgvStatusController = Get.find<PatchDeviceAgvStatusController>();
+
+  void tryUpdateUserId(int deviceId) async {
+    bool success = await patchAgvModeController.initializeData(deviceId);
+    if (success) {
+      patchAgvModeController.update();
+
+      setState(() {
+        // 컨트롤러의 이름 정보를 업데이트합니다.
+        getDeviceAgvController.agvs[widget.devices[deviceId].id].mode =
+            patchAgvModeController.modeController.text;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('수정이 성공적으로 완료되었습니다'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+      getDeviceAgvController.update();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('수정이 실패했습니다'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -245,12 +273,12 @@ class _CustomAgvStatusDataTableState extends State<CustomAgvStatusDataTable> {
                   ),
                   content: Column(
                     children: [
-                      CustomAGVModeDropDownBox(
+                      CustomAGVModeDropDownBox456(
                         label: '현재 모드',
                         text: '${getDeviceAgvController.agvs[index].mode}',
                       ),
                       SizedBox(height: 5),
-                      CustomAGVStatusDropDownBox(
+                      CustomAGVStatusDropDownBox456(
                         label: '현재 상태',
                         text: '${getDeviceAgvController.agvs[index].status}',
                       ),

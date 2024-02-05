@@ -1,10 +1,12 @@
 import 'dart:math';
 
 import 'package:bsn_v2/const/app_text_style.dart';
+import 'package:bsn_v2/controller/device/agv_device/get_device_agv_status_controller.dart';
 import 'package:bsn_v2/controller/device/agv_device/patch_device_agv_battery_level_controller.dart';
 import 'package:bsn_v2/controller/device/agv_device/patch_device_agv_drive_distance_controller.dart';
 import 'package:bsn_v2/controller/device/agv_device/patch_device_agv_mode_controller.dart';
 import 'package:bsn_v2/controller/device/agv_device/patch_device_agv_status_controller.dart';
+import 'package:bsn_v2/controller/device/conveyor_device/get_device_conveyor_status_controller.dart';
 import 'package:bsn_v2/controller/device/conveyor_device/patch_device_conveyor_speed_controller.dart';
 import 'package:bsn_v2/controller/device/conveyor_device/patch_device_conveyor_status_controller.dart';
 import 'package:bsn_v2/controller/device/device/delete_device_status_controller.dart';
@@ -13,6 +15,9 @@ import 'package:bsn_v2/model/cobot.dart';
 import 'package:bsn_v2/model/converyor.dart';
 import 'package:bsn_v2/model/device.dart';
 import 'package:bsn_v2/model/smart_rack.dart';
+import 'package:bsn_v2/view/widget/etc/data_table/conveyor/customConveyorStatusDropDownBox456.dart';
+import 'package:bsn_v2/view/widget/etc/data_table/conveyor/customConveyorspeedDropDownBox456.dart';
+
 import 'package:bsn_v2/view/widget/text_field/custom_deivce_detail_correction_text_filed.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -21,35 +26,36 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
 // 나머지 import 문들...
-class CustomCobotStatusDataTable extends StatefulWidget {
-  final RxList<Cobot> cobots;
+class CustomConveyorStatusDataTable extends StatefulWidget {
+  final RxList<Conveyor> conveyors;
   final RxList<Device> devices;
 
   int? selectedRowIndex;
 
   // 선택된 행을 추적하기 위한 Set 추가
-  CustomCobotStatusDataTable({
-    required this.cobots,
+  CustomConveyorStatusDataTable({
+    required this.conveyors,
     required this.devices,
   });
 
   @override
-  _CustomCobotStatusDataTableState createState() =>
-      _CustomCobotStatusDataTableState();
+  _CustomConveyorStatusDataTableState createState() =>
+      _CustomConveyorStatusDataTableState();
 }
 
-class _CustomCobotStatusDataTableState
-    extends State<CustomCobotStatusDataTable> {
+class _CustomConveyorStatusDataTableState
+    extends State<CustomConveyorStatusDataTable> {
   int? selectedRowIndex; // 추가: 선택된 행의 인덱스를 저장하는 변수
   DateTime? lastTap;
 
   Set<int> selectedRows = Set<int>();
   final deleteDeviceController = Get.find<DeleteDeviceStautsController>();
-  //
-  // var patchConveyorSpeedController =
-  //     Get.find<PatchDeviceConveyorSpeedController>();
-  // var patchConveyorStatusController =
-  //     Get.find<PatchDeviceConveyorStatusController>();
+  var getConveyorStatusController =
+      Get.find<GetDeviceConveyorStatusController>();
+  var patchConveyorSpeedController =
+      Get.find<PatchDeviceConveyorSpeedController>();
+  var patchConveyorStatusController =
+      Get.find<PatchDeviceConveyorStatusController>();
 
   @override
   Widget build(BuildContext context) {
@@ -85,7 +91,7 @@ class _CustomCobotStatusDataTableState
   // _generateRows 함수 수정
   List<TableRow> _generateRows() {
     List<TableRow> rows = [];
-    int loopCount = min(widget.cobots.length, widget.devices.length);
+    int loopCount = min(widget.conveyors.length, widget.devices.length);
 
     for (int i = 0; i < loopCount; i++) {
       Color rowColor = selectedRows.contains(i)
@@ -100,10 +106,11 @@ class _CustomCobotStatusDataTableState
           paddedCell(widget.devices[i].name, 12, Colors.black, i), // 인덱스 전달
           paddedCell(
               widget.devices[i].modelName, 12, Colors.black, i), // 인덱스 전달
-          paddedCell(widget.cobots[i].status, 12, Colors.black, i), // 인덱스 전달
+          paddedCell(widget.conveyors[i].status, 12, Colors.black, i), // 인덱스 전달
 
-          paddedCell(widget.cobots[i].mode, 12, Colors.black, i), // 인덱스 전달
-          paddedCell(widget.cobots[i].mode, 12, Colors.black, i), // 인덱스 전달
+          paddedCell(widget.conveyors[i].speed.toString(), 12, Colors.black,
+              i), // 인덱스 전달
+          paddedCell(widget.conveyors[i].status, 12, Colors.black, i), // 인덱스 전달
 
           paddedCell(widget.devices[i].equippedAt.toString(), 12, Colors.black,
               i), // 인덱스 전달
@@ -199,72 +206,114 @@ class _CustomCobotStatusDataTableState
         showDialog(
           context: context,
           builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text('더블클릭 다이얼로그'),
-              content: Column(
-                children: [
-                  Row(
+            return Dialog(
+              backgroundColor: Colors.white,
+              shape:
+                  OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
+              elevation: 0,
+              child: Container(
+                decoration:
+                    BoxDecoration(borderRadius: BorderRadius.circular(20)),
+                width: 700,
+                height: 440,
+                child: AlertDialog(
+                  backgroundColor: Colors.white,
+                  elevation: 0,
+                  title: Column(
                     children: [
-                      Text('장비 ID: ${widget.devices[index].id}'),
-                      Text('장비 이름: ${widget.devices[index].name}'),
+                      Row(
+                        children: [
+                          Spacer(),
+                          IconButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              icon: Icon(Icons.close))
+                        ],
+                      ),
+                      Text(
+                        'AGV 기본 정보 수정',
+                        style: AppTextStyles.bold
+                            .copyWith(color: Color(0xFF232323)),
+                      ),
+                      SizedBox(height: 5),
+                      Text(
+                        '해당 란을 수정하기 위해선 더블 클릭 해주세요.',
+                        style: AppTextStyles.bold
+                            .copyWith(fontSize: 12, color: Colors.red),
+                      ),
                     ],
                   ),
-                  // CustomDeviceDetailCorrectiontextField(
-                  //   controller: patchConveyorStatusController.statusController,
-                  //   maxLength: 20,
-                  //   labelText: '현재 상태',
-                  // ),
-                  // CustomDeviceDetailCorrectiontextField(
-                  //   controller: patchConveyorSpeedController.speedController,
-                  //   maxLength: 20,
-                  //   labelText: '현재 속도',
-                  // ),
-                ],
+                  content: Column(
+                    children: [
+                      CustomConveyorSpeedDropDownBox456(label: '속도'),
+                      CustomConveyorStatusDropDownBox456(label: '상태'),
+                      SizedBox(height: 15),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.grey,
+                              foregroundColor: Colors.white,
+                              minimumSize: Size(120, 45),
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 8),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                            child: Text('수정완료'),
+                            onPressed: () {
+                              patchConveyorSpeedController
+                                  .initializeData(widget.devices[index].id);
+                              patchConveyorStatusController
+                                  .initializeData(widget.devices[index].id);
+                              print(patchConveyorSpeedController
+                                  .speedController.text);
+                              print(patchConveyorStatusController
+                                  .statusController.text);
+
+                              selectedRowIndex = null;
+
+                              selectedRows.clear();
+                              Navigator.pop(context); // 다이얼로그 닫기
+                              setState(() {});
+                            },
+                          ),
+                          SizedBox(width: 30),
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.grey,
+                              foregroundColor: Colors.white,
+                              minimumSize: Size(120, 45),
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 8),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                            child: Text('삭제하기'),
+                            onPressed: () {
+                              deleteDeviceController
+                                  .initializeData(widget.devices[index].id);
+                              // 선택된 행 삭제
+                              widget.conveyors.removeAt(index);
+                              widget.devices.removeAt(index);
+
+                              // 선택된 행 초기화
+                              selectedRowIndex = null;
+                              selectedRows.clear();
+                              print(index);
+                              Navigator.pop(context);
+                            },
+                          )
+                        ],
+                      )
+                    ],
+                  ),
+                ),
               ),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    // 수정 확인 버튼을 눌렀을 때 호출되는 함수
-                    //patchAgvModeController
-                    //    .initializeData(widget.devices[index].id);
-                    // patchAgvStatusController
-                    //     .initializeData(widget.devices[index].id);
-                    // patchAgvDriveDistancController
-                    //     .initializeData(widget.devices[index].id);
-                    // patchAgvBatterLevelController
-                    //     .initializeData(widget.devices[index].id);
-
-                    // 선택된 행 초기화
-                    selectedRowIndex = null;
-                    selectedRows.clear();
-                    Navigator.pop(context); // 다이얼로그 닫기
-                  },
-                  child: Text('수정 확인'),
-                ),
-                TextButton(
-                  onPressed: () {
-                    // 삭제 버튼을 눌렀을 때 호출되는 함수
-                    //deleteDeviceController
-                    //  .initializeData(widget.devices[index].id);
-                    // 선택된 행 삭제
-                    widget.cobots.removeAt(index);
-                    widget.devices.removeAt(index);
-
-                    // 선택된 행 초기화
-                    selectedRowIndex = null;
-                    selectedRows.clear();
-                    print(index);
-                    Navigator.pop(context); // 다이얼로그 닫기
-                  },
-                  child: Text('삭제'),
-                ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(context); // 다이얼로그 닫기
-                  },
-                  child: Text('확인'),
-                ),
-              ],
             );
           },
         );
@@ -289,7 +338,7 @@ class _CustomCobotStatusDataTableState
         print('야야${index}');
 
         // 선택된 행 삭제
-        widget.cobots.removeAt(index);
+        widget.conveyors.removeAt(index);
         widget.devices.removeAt(index);
 
         // 선택된 행 초기화

@@ -15,18 +15,18 @@ class AccountResetController extends GetxController {
   final GlobalKey<FormState> emailFormKey = GlobalKey<FormState>();
   final TextEditingController emailController = TextEditingController();
 
-  final BASE_URL = '${ApiRoutes.baseUrl}${ApiRoutes.passwordReset}';
+  final BASE_URL = '${ApiRoutes.baseUrl}${ApiRoutes.userPasswordReset}';
 
   String? emailValidator(String? value) {
     if (value == null || value.isEmpty) {
       return 'Please enter your email';
     }
-    // 이메일 형식을 검증하는 정규 표현식
+    // 이메일 형식 및 길이를 검증하는 정규 표현식 수정
     final emailRegex = RegExp(
-      r'^[a-zA-Z0-9._]+@[a-zA-Z0-9]+\.[a-zA-Z]+',
+      r'^[a-zA-Z0-9._]+@[a-zA-Z0-9]+\.[a-zA-Z]{2,}$',
     );
-    if (!emailRegex.hasMatch(value)) {
-      return 'Invalid email format';
+    if (!emailRegex.hasMatch(value) || value.length < 3 || value.length > 511) {
+      return 'Invalid email format or length';
     }
     return null;
   }

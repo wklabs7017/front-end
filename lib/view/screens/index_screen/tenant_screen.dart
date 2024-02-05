@@ -358,22 +358,22 @@ class _TenantScreenState extends State<TenantScreen> {
                                                       CustomTenantListTileDetail(
                                                           label: 'Area',
                                                           text:
-                                                              'x: ${getTenantDetailController.tenants[index].point.latitude}, y: ${getTenantDetailController.tenants[index]!.point.longitude}'),
+                                                              'x: ${getTenantDetailController.tenants[index].point.latitude}, y: ${getTenantDetailController.tenants[index].point.longitude}'),
                                                       SizedBox(height: 5),
                                                       CustomTenantListTileDetail(
                                                           label: 'Devices',
                                                           text:
-                                                              '${getTenantDetailController.tenants[index]!.devices.isEmpty ? 'Not detected' : null}'),
+                                                              '${getTenantDetailController.tenants[index].devices.isEmpty ? 'Not detected' : null}'),
                                                       SizedBox(height: 5),
                                                       CustomTenantListTileDetail(
                                                           label: 'Workers',
                                                           text:
-                                                              '${getTenantDetailController.tenants[index]!.workers.isEmpty ? 'Not detected' : null}'),
+                                                              '${getTenantDetailController.tenants[index].workers.isEmpty ? 'Not detected' : null}'),
                                                       SizedBox(height: 5),
                                                       CustomTenantListTileDetail(
                                                           label: 'createdAt',
                                                           text:
-                                                              '${getTenantDetailController.tenants[index]!.createdAt}'),
+                                                              '${getTenantDetailController.tenants[index].createdAt}'),
                                                       SizedBox(height: 5),
                                                       CustomTenantListTileDetail(
                                                           label: 'deletedAt',

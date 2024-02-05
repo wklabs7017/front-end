@@ -23,8 +23,6 @@ class GetDeviceAgvStatusController extends GetxController {
   void onInit() {
     super.onInit();
     initializeData();
-    update();
-
     print(agvs.value);
   }
 
@@ -60,6 +58,16 @@ class GetDeviceAgvStatusController extends GetxController {
 
     return agvs;
   }
+  // void callGetDeviceStatus() async {
+  //   id = 5;
+  //   try {
+  //     print(id);
+  //     var device = await getDeviceStatus(id!, accessToken!);
+  //     deviceStauts.value = device;
+  //   } catch (e) {
+  //     print('Error fetching devices status: $e');
+  //   }
+  // }
 
   Future<List<AGV>> getDeviceAGVStatus(int id, String accessToken) async {
     try {

@@ -60,6 +60,7 @@ class PatchDeviceAgvDriveDistanceController extends GetxController {
       }
     } on DioException catch (e) {
       print('DioException: ${e.message}');
+      print('DioException: ${e.response}');
 
       throw e;
     } catch (e) {

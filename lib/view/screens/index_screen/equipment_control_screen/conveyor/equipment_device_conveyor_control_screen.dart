@@ -6,11 +6,14 @@ import 'package:bsn_v2/controller/device/conveyor_device/post_device_conveyor_st
 import 'package:bsn_v2/controller/device/device/get_device_status_controller.dart';
 import 'package:bsn_v2/controller/device/smart_rack_device/smart_rack/get_device_smart_rack_status_controller.dart';
 import 'package:bsn_v2/model/smart_rack.dart';
+import 'package:bsn_v2/view/screens/index_screen/equipment_control_screen/conveyor/customCONVEYORspeedDropDownBox123.dart';
+import 'package:bsn_v2/view/screens/index_screen/equipment_control_screen/conveyor/customCONVEYORstatusDropDownBox123.dart';
 import 'package:bsn_v2/view/widget/button/custom_conveyor_device_control_button.dart';
 import 'package:bsn_v2/view/widget/button/custom_task_button.dart';
 import 'package:bsn_v2/view/widget/container/custom_basic_container.dart';
 import 'package:bsn_v2/view/widget/app_bar/custom_overview_screen_app_bar.dart';
-import 'package:bsn_v2/view/widget/etc/data_table/custom_conveyor_data_table.dart';
+import 'package:bsn_v2/view/widget/etc/custom_decoration_text_field.dart';
+import 'package:bsn_v2/view/widget/etc/data_table/conveyor/custom_conveyor_data_table.dart';
 import 'package:bsn_v2/view/widget/etc/data_table/custom_overview_smart_rack_data_table.dart';
 import 'package:bsn_v2/view/widget/etc/custom_device_status_table.dart';
 import 'package:bsn_v2/view/widget/etc/smart_rack_status_table.dart';
@@ -44,6 +47,14 @@ class _EquipmentDeviceConveyorControlScreenState
 
   final List<String> dropdownOptions2 = ['ERROR', 'IDLE', 'RUNNING'];
 
+  @override
+  void initState() {
+    super.initState();
+
+    getDeviceConveyorController.initializeData();
+    getConveyorController.initializeData();
+  }
+
   Widget buildTextField({
     required String label,
     required TextEditingController controller,
@@ -60,11 +71,6 @@ class _EquipmentDeviceConveyorControlScreenState
         ],
       ),
     );
-  }
-
-  @override
-  void initState() {
-    super.initState();
   }
 
   @override
@@ -156,149 +162,93 @@ class _EquipmentDeviceConveyorControlScreenState
                       showDialog(
                         context: context,
                         builder: (BuildContext context) {
-                          return AlertDialog(
-                            title: Text('더블클릭 다이얼로그'),
-                            content: Column(
-                              children: [
-                                buildTextField(
-                                  label: 'Name:',
-                                  controller:
-                                      postDeviceController.nameController,
-                                ),
-                                buildTextField(
-                                  label: 'modelName:',
-                                  controller:
-                                      postDeviceController.modelNameController,
-                                ),
-                                GestureDetector(
-                                  onTap: () async {
-                                    DateTime? pickedDate = await showDatePicker(
-                                      context: context,
-                                      initialDate:
-                                          postDeviceController.equippedAt ??
-                                              DateTime.now(),
-                                      firstDate: DateTime(2022),
-                                      lastDate: DateTime(2025),
-                                    );
-
-                                    if (pickedDate != null) {
-                                      TimeOfDay? pickedTime =
-                                          await showTimePicker(
-                                        context: context,
-                                        initialTime: TimeOfDay.fromDateTime(
-                                          postDeviceController.equippedAt ??
-                                              DateTime.now(),
+                          return Theme(
+                            data: Theme.of(context).copyWith(
+                              dialogBackgroundColor: AppColors.backgroundColor,
+                            ), // 다이얼로그 배경색을 흰색으로 오버라이드
+                            child: Dialog(
+                              shape: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(20)),
+                              elevation: 0,
+                              backgroundColor: Colors.white,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(20)),
+                                width: 700,
+                                height: 500,
+                                child: AlertDialog(
+                                  elevation: 0,
+                                  backgroundColor: Colors.white,
+                                  title: Column(
+                                    children: [
+                                      Container(
+                                        child: Row(
+                                          children: [
+                                            Spacer(),
+                                            IconButton(
+                                                onPressed: () {
+                                                  Navigator.pop(context);
+                                                },
+                                                icon: Icon(Icons.close)),
+                                          ],
                                         ),
-                                      );
-
-                                      if (pickedTime != null) {
-                                        postDeviceController.equippedAt =
-                                            DateTime(
-                                          pickedDate.year,
-                                          pickedDate.month,
-                                          pickedDate.day,
-                                          pickedTime.hour,
-                                          pickedTime.minute,
-                                        );
-                                      }
-                                    }
-                                  },
-                                  child: buildTextField(
-                                    label: 'equipped_at:',
-                                    controller: TextEditingController(
-                                      text: postDeviceController.equippedAt
-                                              ?.toString() ??
-                                          '',
-                                    ),
+                                      ),
+                                      Center(
+                                          child: Text('AGV 장비 추가',
+                                              style: AppTextStyles.bold
+                                                  .copyWith(fontSize: 30))),
+                                    ],
+                                  ),
+                                  content: Column(
+                                    children: [
+                                      CustomConveyorStatusDropDownBox123(
+                                          label: '상태'),
+                                      CustomCOnveyorSpeedDropDownBox123(
+                                          label: '상태'),
+                                      CustomDecorationTextField(
+                                          label: 'name',
+                                          controller: postDeviceController
+                                              .nameController),
+                                      SizedBox(height: 5),
+                                      CustomDecorationTextField(
+                                          label: 'model name',
+                                          controller: postDeviceController
+                                              .modelNameController),
+                                      SizedBox(height: 5),
+                                      CustomDecorationTextField(
+                                          label: 'Manufacturer name',
+                                          controller: postDeviceController
+                                              .manufacturerNameController),
+                                      SizedBox(height: 5),
+                                      CustomDecorationTextField(
+                                          label: 'Tenant Id',
+                                          controller: postDeviceController
+                                              .tenantIdController),
+                                      SizedBox(height: 5),
+                                      SizedBox(height: 10),
+                                      ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.grey,
+                                          foregroundColor: Colors.white,
+                                          minimumSize: Size(120, 45),
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 80, vertical: 8),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                          ),
+                                        ),
+                                        child: Text('장비 추가'),
+                                        onPressed: () {
+                                          postDeviceController.initializeData();
+                                          Navigator.pop(context);
+                                        },
+                                      ),
+                                    ],
                                   ),
                                 ),
-                                buildTextField(
-                                  label: 'manufactruer_Name:',
-                                  controller: postDeviceController
-                                      .manufacturerNameController,
-                                ),
-                                buildTextField(
-                                  label: 'tenant_id:',
-                                  controller:
-                                      postDeviceController.tenantIdController,
-                                ),
-                                DropdownButtonFormField<String>(
-                                  decoration: InputDecoration(
-                                    labelText: 'Select Mode',
-                                    // Add any additional styling or decoration as needed
-                                  ),
-                                  value: dropdownOptions2.contains(
-                                          postDeviceController
-                                              .statusController.text)
-                                      ? postDeviceController
-                                          .statusController.text
-                                      : null,
-                                  items: dropdownOptions2.map((String value) {
-                                    return DropdownMenuItem<String>(
-                                      value: value,
-                                      child: Text(value),
-                                    );
-                                  }).toList(),
-                                  onChanged: (String? newValue) {
-                                    if (newValue != null) {
-                                      postDeviceController
-                                          .statusController.text = newValue;
-                                    }
-                                  },
-                                ),
-                                DropdownButtonFormField<String>(
-                                  decoration: InputDecoration(
-                                    labelText: 'Select Mode',
-                                    // Add any additional styling or decoration as needed
-                                  ),
-                                  value: dropdownOptions1.contains(
-                                          postDeviceController
-                                              .speedController.text)
-                                      ? postDeviceController
-                                          .speedController.text
-                                      : null,
-                                  items: dropdownOptions1.map((int value) {
-                                    return DropdownMenuItem<String>(
-                                      value: value.toString(),
-                                      child: Text(value.toString()),
-                                    );
-                                  }).toList(),
-                                  onChanged: (String? newValue) {
-                                    if (newValue != null) {
-                                      postDeviceController
-                                          .speedController.text = newValue;
-                                    }
-                                  },
-                                ),
-                                ElevatedButton(
-                                  onPressed: () {
-                                    postDeviceController.initializeData();
-                                    print(postDeviceController
-                                        .speedController.text);
-                                    print(postDeviceController
-                                        .nameController.text);
-                                    print(postDeviceController
-                                        .modelNameController.text);
-                                    print(postDeviceController.equippedAt);
-                                    print(postDeviceController
-                                        .tenantIdController.text);
-                                    print(postDeviceController
-                                        .statusController.text);
-                                    print(postDeviceController
-                                        .manufacturerNameController.text);
-                                  },
-                                  child: Text('Submit'),
-                                ),
-                              ],
-                            ),
-                            actions: [
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.pop(context); // 다이얼로그 닫기
-                                },
-                                child: Text('확인'),
                               ),
-                            ],
+                            ),
                           );
                         },
                       );

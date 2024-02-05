@@ -1,6 +1,6 @@
 class Cobot {
   final String status;
-  final String mode;
+  String mode;
 
   Cobot({
     required this.status,

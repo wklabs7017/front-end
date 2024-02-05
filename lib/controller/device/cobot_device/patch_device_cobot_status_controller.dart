@@ -47,13 +47,14 @@ class PatchDeviceCobotStatusController extends GetxController {
         options: Options(headers: {'Authorization': 'Bearer $accessToken'}),
       );
 
-      if (response.statusCode == 201 && response.data != null) {
+      if (response.statusCode == 200 || response.statusCode == 201) {
         print(response.statusCode);
       } else {
         throw Exception('Failed to load Cobot status');
       }
     } on DioException catch (e) {
       print('DioException: ${e.message}');
+      print('DioException: ${e.response}');
 
       throw e;
     } catch (e) {

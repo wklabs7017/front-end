@@ -16,7 +16,7 @@ import 'package:bsn_v2/view/widget/button/custom_device_switch_button.dart';
 import 'package:bsn_v2/view/widget/button/custom_task_button.dart';
 import 'package:bsn_v2/view/widget/container/custom_basic_container.dart';
 import 'package:bsn_v2/view/widget/app_bar/custom_overview_screen_app_bar.dart';
-import 'package:bsn_v2/view/widget/etc/data_table/custom_agv_data_table.dart';
+import 'package:bsn_v2/view/widget/etc/data_table/AGV/custom_agv_data_table.dart';
 import 'package:bsn_v2/view/widget/etc/data_table/custom_overview_smart_rack_data_table.dart';
 import 'package:bsn_v2/view/widget/etc/custom_device_status_table.dart';
 import 'package:bsn_v2/view/widget/etc/custom_task_management_data_table.dart';

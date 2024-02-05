@@ -1,5 +1,6 @@
 import 'package:bsn_v2/const/app_colors.dart';
 import 'package:bsn_v2/const/app_text_style.dart';
+import 'package:bsn_v2/view/screens/index_screen/equipment_control_screen/agv/customAGVmodeDropDownBox123.dart';
 import 'package:bsn_v2/controller/device/agv_device/get_device_agv_controller.dart';
 import 'package:bsn_v2/controller/device/agv_device/get_device_agv_status_controller.dart';
 import 'package:bsn_v2/controller/device/agv_device/patch_device_agv_battery_level_controller.dart';
@@ -10,7 +11,6 @@ import 'package:bsn_v2/controller/device/device/delete_device_status_controller.
 import 'package:bsn_v2/controller/device/device/get_device_status_controller.dart';
 import 'package:bsn_v2/controller/device/smart_rack_device/smart_rack/get_device_smart_rack_status_controller.dart';
 import 'package:bsn_v2/controller/manufacturer/get_manufacturer_controller.dart';
-import 'package:bsn_v2/model/smart_rack.dart';
 import 'package:bsn_v2/view/widget/button/custom_default_control_button.dart';
 import 'package:bsn_v2/view/widget/button/custom_default_control_container.dart';
 import 'package:bsn_v2/view/widget/button/custom_default_control_mini_button.dart';
@@ -18,16 +18,20 @@ import 'package:bsn_v2/view/widget/button/custom_device_switch_button.dart';
 import 'package:bsn_v2/view/widget/button/custom_task_button.dart';
 import 'package:bsn_v2/view/widget/container/custom_basic_container.dart';
 import 'package:bsn_v2/view/widget/app_bar/custom_overview_screen_app_bar.dart';
-import 'package:bsn_v2/view/widget/etc/data_table/custom_agv_data_table.dart';
+
+import 'package:bsn_v2/view/widget/etc/custom_decoration_text_field.dart';
+import 'package:bsn_v2/view/widget/etc/data_table/AGV/custom_agv_data_table.dart';
 import 'package:bsn_v2/view/widget/etc/data_table/custom_overview_smart_rack_data_table.dart';
 import 'package:bsn_v2/view/widget/etc/custom_device_status_table.dart';
 import 'package:bsn_v2/view/widget/etc/custom_velocity_control_pannel.dart';
 import 'package:bsn_v2/view/widget/etc/smart_rack_status_table.dart';
 import 'package:bsn_v2/view/widget/etc/user_management_table.dart';
+import 'package:bsn_v2/view/widget/text_field/custom_text_form_field.dart';
 import 'package:bsn_v2/view/widget/text_field/new_custom_text_form_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:bsn_v2/view/screens/index_screen/equipment_control_screen/agv/customAGVstatusDropDownBox123.dart';
 
 class EquipmentDeviceAgvControlScreen extends StatefulWidget {
   EquipmentDeviceAgvControlScreen({super.key});
@@ -56,10 +60,8 @@ class _EquipmentDeviceAgvControlScreenState
   void initState() {
     super.initState();
 
-    // 페이지로 돌아갈 때마다 컨트롤러를 다시 초기화합니다.
-    dropdownOptions3 = getManufacturerController.manufacturerDetail
-        .map((manufacturer) => manufacturer.name)
-        .toList();
+    getDeviceAgvController.initializeData();
+    getDeviceController.initializeData();
   }
 
   // 함수 추가: 제조사 선택 다이얼로그
@@ -275,103 +277,77 @@ class _EquipmentDeviceAgvControlScreenState
                                 decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(20)),
                                 width: 700,
-                                height: 600,
+                                height: 500,
                                 child: AlertDialog(
                                   elevation: 0,
                                   backgroundColor: Colors.white,
-                                  title: Center(
-                                      child: Text('장비 추가',
-                                          style: AppTextStyles.bold
-                                              .copyWith(fontSize: 30))),
+                                  title: Column(
+                                    children: [
+                                      Container(
+                                        child: Row(
+                                          children: [
+                                            Spacer(),
+                                            IconButton(
+                                                onPressed: () {
+                                                  Navigator.pop(context);
+                                                },
+                                                icon: Icon(Icons.close)),
+                                          ],
+                                        ),
+                                      ),
+                                      Center(
+                                          child: Text('AGV 장비 추가',
+                                              style: AppTextStyles.bold
+                                                  .copyWith(fontSize: 30))),
+                                    ],
+                                  ),
                                   content: Column(
                                     children: [
-                                      buildTextField(
-                                          label: 'Name  ',
+                                      CustomDecorationTextField(
+                                          label: 'name',
                                           controller: postDeviceAgvController
                                               .nameController),
-                                      buildTextField(
-                                        label: 'Model Name  ',
-                                        controller: postDeviceAgvController
-                                            .modelNameController,
-                                      ),
-                                      buildTextField(
-                                        label: 'Manufacturer Name  ',
-                                        controller: postDeviceAgvController
-                                            .manufacturerName2Controller,
-                                      ),
-                                      buildTextField(
-                                        label: 'tenantID  ',
-                                        controller: postDeviceAgvController
-                                            .tenantIdController,
-                                      ),
-                                      DropdownButtonFormField<String>(
-                                        decoration: InputDecoration(
-                                          labelText: 'Select Status',
-                                          // Add any additional styling or decoration as needed
-                                        ),
-                                        value: dropdownOptions2.contains(
-                                                postDeviceAgvController
-                                                    .statusController.text)
-                                            ? postDeviceAgvController
-                                                .statusController.text
-                                            : null,
-                                        items: dropdownOptions2
-                                            .map((String value) {
-                                          return DropdownMenuItem<String>(
-                                            value: value,
-                                            child: Text(value),
-                                          );
-                                        }).toList(),
-                                        onChanged: (String? newValue) {
-                                          if (newValue != null) {
-                                            postDeviceAgvController
-                                                .statusController
-                                                .text = newValue;
-                                          }
-                                        },
-                                      ),
-                                      DropdownButtonFormField<String>(
-                                        decoration: InputDecoration(
-                                          labelText: 'Select Mode',
-                                          // Add any additional styling or decoration as needed
-                                        ),
-                                        value: dropdownOptions1.contains(
-                                                postDeviceAgvController
-                                                    .modeController.text)
-                                            ? postDeviceAgvController
-                                                .modeController.text
-                                            : null,
-                                        items: dropdownOptions1
-                                            .map((String value) {
-                                          return DropdownMenuItem<String>(
-                                            value: value,
-                                            child: Text(value),
-                                          );
-                                        }).toList(),
-                                        onChanged: (String? newValue) {
-                                          if (newValue != null) {
-                                            postDeviceAgvController
-                                                .modeController.text = newValue;
-                                          }
-                                        },
-                                      ),
+                                      SizedBox(height: 5),
+                                      CustomDecorationTextField(
+                                          label: 'model name',
+                                          controller: postDeviceAgvController
+                                              .modelNameController),
+                                      SizedBox(height: 5),
+                                      CustomDecorationTextField(
+                                          label: 'Manufacturer name',
+                                          controller: postDeviceAgvController
+                                              .manufacturerNameController),
+                                      SizedBox(height: 5),
+                                      CustomDecorationTextField(
+                                          label: 'Tenant Id',
+                                          controller: postDeviceAgvController
+                                              .tenantIdController),
+                                      CustomAGVModeDropDownBox123(label: '모드'),
+                                      CustomAGVStatusDropDownBox123(
+                                          label: '상태'),
+                                      SizedBox(height: 5),
+                                      SizedBox(height: 10),
                                       ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.grey,
+                                          foregroundColor: Colors.white,
+                                          minimumSize: Size(120, 45),
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 80, vertical: 8),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                          ),
+                                        ),
+                                        child: Text('장비 추가'),
                                         onPressed: () {
                                           postDeviceAgvController
                                               .initializeData();
+                                          Navigator.pop(context);
                                         },
-                                        child: Text('Submit'),
                                       ),
                                     ],
                                   ),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.pop(context); // 다이얼로그 닫기
-                                      },
-                                      child: Text('확인'),
-                                    ),
-                                  ],
                                 ),
                               ),
                             ),
