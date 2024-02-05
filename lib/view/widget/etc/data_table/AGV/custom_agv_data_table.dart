@@ -19,8 +19,8 @@ import 'package:get/get.dart';
 
 // 나머지 import 문들...
 class CustomAgvStatusDataTable extends StatefulWidget {
-  final RxList<AGV> agvs;
-  final RxList<Device> devices;
+  final List<AGV> agvs;
+  final List<Device> devices;
 
   int? selectedRowIndex;
 
@@ -80,7 +80,7 @@ class _CustomAgvStatusDataTableState extends State<CustomAgvStatusDataTable> {
 
   @override
   Widget build(BuildContext context) {
-    return Obx(() => SingleChildScrollView(
+    return SingleChildScrollView(
         scrollDirection: Axis.vertical,
         child: Table(
           border: TableBorder.all(
@@ -108,7 +108,7 @@ class _CustomAgvStatusDataTableState extends State<CustomAgvStatusDataTable> {
                 ),
               ] +
               _generateRows(),
-        )));
+        ));
   }
 
   // _generateRows 함수 수정
