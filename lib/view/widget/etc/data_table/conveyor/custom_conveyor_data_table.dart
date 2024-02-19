@@ -1,11 +1,13 @@
 import 'dart:math';
 
 import 'package:bsn_v2/const/app_text_style.dart';
+import 'package:bsn_v2/controller/device/agv_device/get_device_agv_controller.dart';
 import 'package:bsn_v2/controller/device/agv_device/get_device_agv_status_controller.dart';
 import 'package:bsn_v2/controller/device/agv_device/patch_device_agv_battery_level_controller.dart';
 import 'package:bsn_v2/controller/device/agv_device/patch_device_agv_drive_distance_controller.dart';
 import 'package:bsn_v2/controller/device/agv_device/patch_device_agv_mode_controller.dart';
 import 'package:bsn_v2/controller/device/agv_device/patch_device_agv_status_controller.dart';
+import 'package:bsn_v2/controller/device/conveyor_device/get_device_conveyor_controller.dart';
 import 'package:bsn_v2/controller/device/conveyor_device/get_device_conveyor_status_controller.dart';
 import 'package:bsn_v2/controller/device/conveyor_device/patch_device_conveyor_speed_controller.dart';
 import 'package:bsn_v2/controller/device/conveyor_device/patch_device_conveyor_status_controller.dart';
@@ -27,16 +29,18 @@ import 'package:intl/intl.dart';
 
 // 나머지 import 문들...
 class CustomConveyorStatusDataTable extends StatefulWidget {
-  final RxList<Conveyor> conveyors;
-  final RxList<Device> devices;
+  // final RxList<Conveyor> conveyors;
+  // final RxList<Device> devices;
 
   int? selectedRowIndex;
 
+  CustomConveyorStatusDataTable({super.key});
+
   // 선택된 행을 추적하기 위한 Set 추가
-  CustomConveyorStatusDataTable({
-    required this.conveyors,
-    required this.devices,
-  });
+  // CustomConveyorStatusDataTable({
+  //   required this.conveyors,
+  //   required this.devices,
+  // });
 
   @override
   _CustomConveyorStatusDataTableState createState() =>
@@ -57,41 +61,53 @@ class _CustomConveyorStatusDataTableState
   var patchConveyorStatusController =
       Get.find<PatchDeviceConveyorStatusController>();
 
+  final getDeviceController = Get.find<GetDeviceConveyorController>();
+
   @override
   Widget build(BuildContext context) {
-    return Obx(() => SingleChildScrollView(
-        scrollDirection: Axis.vertical,
-        child: Table(
-          border: TableBorder.all(
-            color: Colors.transparent,
-            width: 1, // 두께를 30에서 1로 조정하여 더 적절한 시각적 표현을 제공
-          ),
-          children: [
-                TableRow(
-                  decoration: BoxDecoration(
-                    border: Border(
-                        bottom: BorderSide(color: Colors.blue, width: 2)),
+    return Obx(() {
+      final conveyors = getConveyorStatusController.conveyors;
+      final devices = getDeviceController.filteredDevices;
+      return SingleChildScrollView(
+          scrollDirection: Axis.vertical,
+          child: Table(
+            border: TableBorder.all(
+              color: Colors.transparent,
+              width: 1, // 두께를 30에서 1로 조정하여 더 적절한 시각적 표현을 제공
+            ),
+            children: [
+                  TableRow(
+                    decoration: BoxDecoration(
+                      border: Border(
+                          bottom: BorderSide(color: Colors.blue, width: 2)),
+                    ),
+                    children: [
+                      paddedCell('No.', 9, Colors.blue, 0),
+                      paddedCell('장비 이름', 9, Colors.blue, 1),
+                      paddedCell('연결 상태', 9, Colors.blue, 2),
+                      paddedCell('현재 상태', 9, Colors.blue, 4),
+                      paddedCell('현재 속도', 9, Colors.blue, 5),
+                      paddedCell('마지막 연결 시간', 9, Colors.blue, 7),
+                      paddedCell('활동 기록', 9, Colors.blue, 8),
+                      paddedCell('정비 기록', 9, Colors.blue, 9),
+                    ],
                   ),
-                  children: [
-                    paddedCell('No.', 9, Colors.blue, 0),
-                    paddedCell('장비 이름', 9, Colors.blue, 1),
-                    paddedCell('연결 상태', 9, Colors.blue, 2),
-                    paddedCell('현재 상태', 9, Colors.blue, 4),
-                    paddedCell('현재 속도', 9, Colors.blue, 5),
-                    paddedCell('마지막 연결 시간', 9, Colors.blue, 7),
-                    paddedCell('활동 기록', 9, Colors.blue, 8),
-                    paddedCell('정비 기록', 9, Colors.blue, 9),
-                  ],
+                ] +
+                _generateRows(
+                  conveyors,
+                  devices,
                 ),
-              ] +
-              _generateRows(),
-        )));
+          ));
+    });
   }
 
   // _generateRows 함수 수정
-  List<TableRow> _generateRows() {
+  List<TableRow> _generateRows(
+    List<Conveyor> conveyors,
+    List<Device> devices,
+  ) {
     List<TableRow> rows = [];
-    int loopCount = min(widget.conveyors.length, widget.devices.length);
+    int loopCount = min(conveyors.length, devices.length);
 
     for (int i = 0; i < loopCount; i++) {
       Color rowColor = selectedRows.contains(i)
@@ -101,21 +117,19 @@ class _CustomConveyorStatusDataTableState
       rows.add(TableRow(
         decoration: BoxDecoration(color: rowColor),
         children: <Widget>[
-          paddedCell(
-              widget.devices[i].id.toString(), 12, Colors.black, i), // 인덱스 전달
-          paddedCell(widget.devices[i].name, 12, Colors.black, i), // 인덱스 전달
-          paddedCell(
-              widget.devices[i].modelName, 12, Colors.black, i), // 인덱스 전달
-          paddedCell(widget.conveyors[i].status, 12, Colors.black, i), // 인덱스 전달
+          paddedCell(devices[i].id.toString(), 12, Colors.black, i), // 인덱스 전달
+          paddedCell(devices[i].name, 12, Colors.black, i), // 인덱스 전달
+          paddedCell(devices[i].modelName, 12, Colors.black, i), // 인덱스 전달
+          paddedCell(conveyors[i].status, 12, Colors.black, i), // 인덱스 전달
 
-          paddedCell(widget.conveyors[i].speed.toString(), 12, Colors.black,
-              i), // 인덱스 전달
-          paddedCell(widget.conveyors[i].status, 12, Colors.black, i), // 인덱스 전달
+          paddedCell(
+              conveyors[i].speed.toString(), 12, Colors.black, i), // 인덱스 전달
+          paddedCell(conveyors[i].status, 12, Colors.black, i), // 인덱스 전달
 
-          paddedCell(widget.devices[i].equippedAt.toString(), 12, Colors.black,
-              i), // 인덱스 전달
-          paddedCell(widget.devices[i].tenantId.toString(), 12, Colors.black,
-              i), // 인덱스 전달
+          paddedCell(
+              devices[i].equippedAt.toString(), 12, Colors.black, i), // 인덱스 전달
+          paddedCell(
+              devices[i].tenantId.toString(), 12, Colors.black, i), // 인덱스 전달
         ],
       ));
     }
@@ -186,6 +200,8 @@ class _CustomConveyorStatusDataTableState
   }
 
   void _onRowTap(int index) {
+    final conveyors = getConveyorStatusController.conveyors;
+    final devices = getDeviceController.filteredDevices;
     final DateTime now = DateTime.now();
     if (lastTap == null ||
         now.difference(lastTap!) > Duration(milliseconds: 300)) {
@@ -264,15 +280,15 @@ class _CustomConveyorStatusDataTableState
                               ),
                             ),
                             child: Text('수정완료'),
-                            onPressed: () {
-                              patchConveyorSpeedController
-                                  .initializeData(widget.devices[index].id);
-                              patchConveyorStatusController
-                                  .initializeData(widget.devices[index].id);
-                              print(patchConveyorSpeedController
-                                  .speedController.text);
-                              print(patchConveyorStatusController
-                                  .statusController.text);
+                            onPressed: () async {
+                              await patchConveyorSpeedController
+                                  .initializeData(devices[index].id);
+                              await patchConveyorStatusController
+                                  .initializeData(devices[index].id);
+
+                              await getConveyorStatusController
+                                  .initializeData();
+                              await getDeviceController.initializeData();
 
                               selectedRowIndex = null;
 
@@ -296,10 +312,10 @@ class _CustomConveyorStatusDataTableState
                             child: Text('삭제하기'),
                             onPressed: () {
                               deleteDeviceController
-                                  .initializeData(widget.devices[index].id);
+                                  .initializeData(devices[index].id);
                               // 선택된 행 삭제
-                              widget.conveyors.removeAt(index);
-                              widget.devices.removeAt(index);
+                              conveyors.removeAt(index);
+                              devices.removeAt(index);
 
                               // 선택된 행 초기화
                               selectedRowIndex = null;
@@ -329,6 +345,8 @@ class _CustomConveyorStatusDataTableState
   }
 
   void _deleteSelectedRow(int index) {
+    final conveyors = getConveyorStatusController.conveyors;
+    final devices = getDeviceController.filteredDevices;
     // 선택된 행에 대한 삭제 로직 구현
     if (selectedRowIndex != null) {
       setState(() {
@@ -338,8 +356,8 @@ class _CustomConveyorStatusDataTableState
         print('야야${index}');
 
         // 선택된 행 삭제
-        widget.conveyors.removeAt(index);
-        widget.devices.removeAt(index);
+        conveyors.removeAt(index);
+        devices.removeAt(index);
 
         // 선택된 행 초기화
         selectedRowIndex = null;

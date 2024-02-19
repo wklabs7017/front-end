@@ -16,19 +16,20 @@ class PatchDeviceConveyorStatusController extends GetxController {
 
   final BASE_URL = '${ApiRoutes.baseUrl}${ApiRoutes.patchDeviceConveyorStatus}';
 
-  void initializeData(int deviceId) async {
+  Future<void> initializeData(int deviceId) async {
     final prefs = await SharedPreferences.getInstance();
     accessToken = prefs.getString('access_token');
     id = prefs.getInt('id');
 
     if (accessToken != null && id != null) {
       callPatchDeviceConveyorStatus(deviceId);
+      update();
     } else {
       print('Access Token or ID is null');
     }
   }
 
-  void callPatchDeviceConveyorStatus(int deviceId) async {
+  callPatchDeviceConveyorStatus(int deviceId) async {
     try {
       await patchDeviceConveyorStatus(
           deviceId!, accessToken!, statusController.text);

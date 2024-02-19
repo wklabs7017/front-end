@@ -17,7 +17,7 @@ class PatchDeviceAgvDriveDistanceController extends GetxController {
 
   TextEditingController driveDistanceController = TextEditingController();
 
-  void initializeData(int deviceId) async {
+  Future<void> initializeData(int deviceId) async {
     final prefs = await SharedPreferences.getInstance();
     accessToken = prefs.getString('access_token');
     id = prefs.getInt('id');

@@ -26,12 +26,14 @@ class GetDeviceCobotStatusController extends GetxController {
     print(cobots.value);
   }
 
-  void initializeData() async {
+  Future<void> initializeData() async {
     final prefs = await SharedPreferences.getInstance();
     accessToken = prefs.getString('access_token');
     id = prefs.getInt('id');
 
     if (accessToken != null && id != null) {
+      cobots.clear();
+
       fetchDevicesInRange(1, 50, accessToken!);
     } else {
       print('Access Token or ID is null');

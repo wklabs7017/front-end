@@ -30,12 +30,13 @@ class GetDeviceAgvStatusController extends GetxController {
     agvs.assignAll(newAgvs);
   }
 
-  void initializeData() async {
+  Future<void> initializeData() async {
     final prefs = await SharedPreferences.getInstance();
     accessToken = prefs.getString('access_token');
     id = prefs.getInt('id');
 
     if (accessToken != null && id != null) {
+      agvs.clear();
       fetchDevicesInRange(1, 50, accessToken!);
     } else {
       print('Access Token or ID is null');

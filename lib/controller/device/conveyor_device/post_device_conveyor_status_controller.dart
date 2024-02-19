@@ -33,19 +33,19 @@ class PostDeviceConveyorStatusController extends GetxController {
     initializeData();
   }
 
-  void initializeData() async {
+  Future<void> initializeData() async {
     final prefs = await SharedPreferences.getInstance();
     accessToken = prefs.getString('access_token');
     id = prefs.getInt('id');
 
     if (accessToken != null && id != null) {
-      callPostDeviceConveyorStatus();
+      await callPostDeviceConveyorStatus();
     } else {
       print('Access Token or ID is null');
     }
   }
 
-  void callPostDeviceConveyorStatus() async {
+  Future<void> callPostDeviceConveyorStatus() async {
     equippedAt = DateTime.now(); // 현재 시각으로 업데이트
     int? tenantId = int.tryParse(tenantIdController.text);
 

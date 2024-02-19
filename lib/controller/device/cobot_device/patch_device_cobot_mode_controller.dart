@@ -32,6 +32,7 @@ class PatchDeviceCobotModeController extends GetxController {
 
     if (accessToken != null && id != null) {
       callPatchDeviceCobotMode(deviceId);
+      update();
       return true;
     } else {
       print('Access Token or ID is null');

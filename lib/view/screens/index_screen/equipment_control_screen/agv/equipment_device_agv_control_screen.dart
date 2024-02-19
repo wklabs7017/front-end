@@ -340,10 +340,15 @@ class _EquipmentDeviceAgvControlScreenState
                                           ),
                                         ),
                                         child: Text('장비 추가'),
-                                        onPressed: () {
-                                          postDeviceAgvController
-                                              .initializeData();
+                                        onPressed: () async {
                                           Navigator.pop(context);
+                                          await postDeviceAgvController
+                                              .initializeData();
+
+                                          await getDeviceAgvController
+                                              .initializeData();
+                                          await getDeviceController
+                                              .initializeData();
                                         },
                                       ),
                                     ],
@@ -363,9 +368,7 @@ class _EquipmentDeviceAgvControlScreenState
             CustomBasicContainer(
               width: screenWidth,
               height: 200.h,
-              child: CustomAgvStatusDataTable(
-                  agvs: getDeviceAgvController.agvs,
-                  devices: getDeviceController.filteredDevices),
+              child: CustomAgvStatusDataTable(),
             ),
           ],
         ),
@@ -516,9 +519,7 @@ class _EquipmentDeviceAgvControlScreenState
                 CustomBasicContainer(
                   width: 350,
                   height: 200,
-                  child: CustomAgvStatusDataTable(
-                      agvs: getDeviceAgvController.agvs,
-                      devices: getDeviceController.devices),
+                  child: CustomAgvStatusDataTable(),
                 ),
               ],
             )

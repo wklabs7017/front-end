@@ -194,7 +194,7 @@ class _EquipmentDeviceConveyorControlScreenState
                                         ),
                                       ),
                                       Center(
-                                          child: Text('AGV 장비 추가',
+                                          child: Text('Conveyor 장비 추가',
                                               style: AppTextStyles.bold
                                                   .copyWith(fontSize: 30))),
                                     ],
@@ -239,8 +239,13 @@ class _EquipmentDeviceConveyorControlScreenState
                                           ),
                                         ),
                                         child: Text('장비 추가'),
-                                        onPressed: () {
-                                          postDeviceController.initializeData();
+                                        onPressed: () async {
+                                          await postDeviceController
+                                              .initializeData();
+                                          await getConveyorController
+                                              .initializeData();
+                                          await getDeviceConveyorController
+                                              .initializeData();
                                           Navigator.pop(context);
                                         },
                                       ),
@@ -261,9 +266,7 @@ class _EquipmentDeviceConveyorControlScreenState
             CustomBasicContainer(
               width: screenWidth,
               height: 150,
-              child: CustomConveyorStatusDataTable(
-                  conveyors: getConveyorController.conveyors,
-                  devices: getDeviceConveyorController.filteredDevices),
+              child: CustomConveyorStatusDataTable(),
             ),
           ],
         ),
@@ -356,9 +359,7 @@ class _EquipmentDeviceConveyorControlScreenState
                 CustomBasicContainer(
                   width: 350,
                   height: 350,
-                  child: CustomConveyorStatusDataTable(
-                      conveyors: getConveyorController.conveyorStatus,
-                      devices: getDeviceConveyorController.filteredDevices),
+                  child: CustomConveyorStatusDataTable(),
                 ),
               ],
             )

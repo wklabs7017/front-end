@@ -258,7 +258,7 @@ class _EquipmentDeviceCobotControlScreenState
                                         ),
                                       ),
                                       Center(
-                                          child: Text('AGV 장비 추가',
+                                          child: Text('협동로봇 장비 추가',
                                               style: AppTextStyles.bold
                                                   .copyWith(fontSize: 30))),
                                     ],
@@ -303,8 +303,12 @@ class _EquipmentDeviceCobotControlScreenState
                                           ),
                                         ),
                                         child: Text('장비 추가'),
-                                        onPressed: () {
-                                          postDeviceCobotController
+                                        onPressed: () async {
+                                          await postDeviceCobotController
+                                              .initializeData();
+                                          await getDeviceCobotController
+                                              .initializeData();
+                                          await getDeviceController
                                               .initializeData();
                                           Navigator.pop(context);
                                         },
@@ -327,9 +331,7 @@ class _EquipmentDeviceCobotControlScreenState
             CustomBasicContainer(
               width: screenWidth,
               height: 150,
-              child: CustomCobotStatusDataTable(
-                  cobots: getDeviceCobotController.cobots,
-                  devices: getDeviceController.filteredDevices),
+              child: CustomCobotStatusDataTable(),
             ),
           ],
         ),
@@ -513,9 +515,7 @@ class _EquipmentDeviceCobotControlScreenState
                 CustomBasicContainer(
                   width: 350,
                   height: 150,
-                  child: CustomCobotStatusDataTable(
-                      cobots: getDeviceCobotController.cobots,
-                      devices: getDeviceController.devices),
+                  child: CustomCobotStatusDataTable(),
                 ),
               ],
             )

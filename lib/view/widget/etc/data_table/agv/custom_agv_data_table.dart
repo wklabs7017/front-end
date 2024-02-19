@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:bsn_v2/const/app_text_style.dart';
+import 'package:bsn_v2/controller/device/agv_device/get_device_agv_controller.dart';
 import 'package:bsn_v2/controller/device/agv_device/get_device_agv_status_controller.dart';
 import 'package:bsn_v2/controller/device/agv_device/patch_device_agv_battery_level_controller.dart';
 import 'package:bsn_v2/controller/device/agv_device/patch_device_agv_drive_distance_controller.dart';
@@ -19,16 +20,9 @@ import 'package:get/get.dart';
 
 // 나머지 import 문들...
 class CustomAgvStatusDataTable extends StatefulWidget {
-  final List<AGV> agvs;
-  final List<Device> devices;
-
   int? selectedRowIndex;
 
-  // 선택된 행을 추적하기 위한 Set 추가
-  CustomAgvStatusDataTable({
-    required this.agvs,
-    required this.devices,
-  });
+  CustomAgvStatusDataTable({super.key});
 
   @override
   _CustomAgvStatusDataTableState createState() =>
@@ -42,6 +36,7 @@ class _CustomAgvStatusDataTableState extends State<CustomAgvStatusDataTable> {
   Set<int> selectedRows = Set<int>();
   final deleteDeviceController = Get.find<DeleteDeviceStautsController>();
   final getDeviceAgvController = Get.find<GetDeviceAgvStatusController>();
+  final getDeviceController = Get.find<GetDeviceAGVController>();
 
   var patchAgvBatterLevelController =
       Get.find<PatchDeviceAgvBatteryLevelController>();
@@ -52,12 +47,15 @@ class _CustomAgvStatusDataTableState extends State<CustomAgvStatusDataTable> {
 
   void tryUpdateUserId(int deviceId) async {
     bool success = await patchAgvModeController.initializeData(deviceId);
+
+    final devices = getDeviceController.filteredDevices;
+
     if (success) {
       patchAgvModeController.update();
 
       setState(() {
         // 컨트롤러의 이름 정보를 업데이트합니다.
-        getDeviceAgvController.agvs[widget.devices[deviceId].id].mode =
+        getDeviceAgvController.agvs[devices[deviceId].id].mode =
             patchAgvModeController.modeController.text;
       });
 
@@ -80,41 +78,52 @@ class _CustomAgvStatusDataTableState extends State<CustomAgvStatusDataTable> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-        scrollDirection: Axis.vertical,
-        child: Table(
-          border: TableBorder.all(
-            color: Colors.transparent,
-            width: 1, // 두께를 30에서 1로 조정하여 더 적절한 시각적 표현을 제공
-          ),
-          children: [
-                TableRow(
-                  decoration: BoxDecoration(
-                    border: Border(
-                        bottom: BorderSide(color: Colors.blue, width: 2)),
+    return Obx(() {
+      final agvs = getDeviceAgvController.agvs;
+      final devices = getDeviceController.filteredDevices;
+
+      return SingleChildScrollView(
+          scrollDirection: Axis.vertical,
+          child: Table(
+            border: TableBorder.all(
+              color: Colors.transparent,
+              width: 1, // 두께를 30에서 1로 조정하여 더 적절한 시각적 표현을 제공
+            ),
+            children: [
+                  TableRow(
+                    decoration: BoxDecoration(
+                      border: Border(
+                          bottom: BorderSide(color: Colors.blue, width: 2)),
+                    ),
+                    children: [
+                      paddedCell('No.', 9, Colors.blue, 0),
+                      paddedCell('장비 이름', 9, Colors.blue, 1),
+                      paddedCell('연결 상태', 9, Colors.blue, 2),
+                      paddedCell('작동 모드', 9, Colors.blue, 3),
+                      paddedCell('현재 상태', 9, Colors.blue, 4),
+                      paddedCell('총 주행거리', 9, Colors.blue, 5),
+                      paddedCell('배터리 잔량', 9, Colors.blue, 6),
+                      paddedCell('마지막 연결 시간', 9, Colors.blue, 7),
+                      paddedCell('활동 기록', 9, Colors.blue, 8),
+                      paddedCell('정비 기록', 9, Colors.blue, 9),
+                    ],
                   ),
-                  children: [
-                    paddedCell('No.', 9, Colors.blue, 0),
-                    paddedCell('장비 이름', 9, Colors.blue, 1),
-                    paddedCell('연결 상태', 9, Colors.blue, 2),
-                    paddedCell('작동 모드', 9, Colors.blue, 3),
-                    paddedCell('현재 상태', 9, Colors.blue, 4),
-                    paddedCell('총 주행거리', 9, Colors.blue, 5),
-                    paddedCell('배터리 잔량', 9, Colors.blue, 6),
-                    paddedCell('마지막 연결 시간', 9, Colors.blue, 7),
-                    paddedCell('활동 기록', 9, Colors.blue, 8),
-                    paddedCell('정비 기록', 9, Colors.blue, 9),
-                  ],
+                ] +
+                _generateRows(
+                  agvs,
+                  devices,
                 ),
-              ] +
-              _generateRows(),
-        ));
+          ));
+    });
   }
 
   // _generateRows 함수 수정
-  List<TableRow> _generateRows() {
+  List<TableRow> _generateRows(
+    List<AGV> agvs,
+    List<Device> devices,
+  ) {
     List<TableRow> rows = [];
-    int loopCount = min(widget.agvs.length, widget.devices.length);
+    int loopCount = min(agvs.length, devices.length);
 
     for (int i = 0; i < loopCount; i++) {
       Color rowColor = selectedRows.contains(i)
@@ -124,22 +133,20 @@ class _CustomAgvStatusDataTableState extends State<CustomAgvStatusDataTable> {
       rows.add(TableRow(
         decoration: BoxDecoration(color: rowColor),
         children: <Widget>[
+          paddedCell(devices[i].id.toString(), 12, Colors.black, i), // 인덱스 전달
+          paddedCell(devices[i].name, 12, Colors.black, i), // 인덱스 전달
+          paddedCell(devices[i].modelName, 12, Colors.black, i), // 인덱스 전달
+          paddedCell(agvs[i].mode, 12, Colors.black, i), // 인덱스 전달
+          paddedCell(agvs[i].status, 12, Colors.black, i), // 인덱스 전달
           paddedCell(
-              widget.devices[i].id.toString(), 12, Colors.black, i), // 인덱스 전달
-          paddedCell(widget.devices[i].name, 12, Colors.black, i), // 인덱스 전달
+              agvs[i].driveDistance.toString(), 12, Colors.black, i), // 인덱스 전달
           paddedCell(
-              widget.devices[i].modelName, 12, Colors.black, i), // 인덱스 전달
-          paddedCell(widget.agvs[i].mode, 12, Colors.black, i), // 인덱스 전달
-          paddedCell(widget.agvs[i].status, 12, Colors.black, i), // 인덱스 전달
-          paddedCell(widget.agvs[i].driveDistance.toString(), 12, Colors.black,
-              i), // 인덱스 전달
-          paddedCell(widget.agvs[i].batteryLevel.toString(), 12, Colors.black,
-              i), // 인덱스 전달
-          paddedCell(widget.devices[i].equippedAt.toString(), 12, Colors.black,
-              i), // 인덱스 전달
-          paddedCell(widget.devices[i].tenantId.toString(), 12, Colors.black,
-              i), // 인덱스 전달
-          paddedCell(widget.devices[i].type, 12, Colors.black, i), // 인덱스 전달
+              agvs[i].batteryLevel.toString(), 12, Colors.black, i), // 인덱스 전달
+          paddedCell(
+              devices[i].equippedAt.toString(), 12, Colors.black, i), // 인덱스 전달
+          paddedCell(
+              devices[i].tenantId.toString(), 12, Colors.black, i), // 인덱스 전달
+          paddedCell(devices[i].type, 12, Colors.black, i), // 인덱스 전달
         ],
       ));
     }
@@ -212,13 +219,16 @@ class _CustomAgvStatusDataTableState extends State<CustomAgvStatusDataTable> {
   }
 
   void _onRowTap(int index) {
+    final agvs = getDeviceAgvController.agvs;
+    final devices = getDeviceController.filteredDevices;
+
     final DateTime now = DateTime.now();
     if (lastTap == null ||
         now.difference(lastTap!) > Duration(milliseconds: 300)) {
       // 첫 클릭 또는 더블 클릭이 아닌 경우
       setState(() {
         // 선택된 행 초기화 후 현재 클릭한 행만 선택
-        patchAgvModeController.modeController.text = widget.agvs[index].mode;
+        patchAgvModeController.modeController.text = agvs[index].mode;
 
         selectedRows = {index};
       });
@@ -314,20 +324,25 @@ class _CustomAgvStatusDataTableState extends State<CustomAgvStatusDataTable> {
                               ),
                             ),
                             child: Text('수정완료'),
-                            onPressed: () {
-                              patchAgvModeController
-                                  .initializeData(widget.devices[index].id);
-                              patchAgvStatusController
-                                  .initializeData(widget.devices[index].id);
-                              patchAgvDriveDistancController
-                                  .initializeData(widget.devices[index].id);
-                              patchAgvBatterLevelController
-                                  .initializeData(widget.devices[index].id);
+                            onPressed: () async {
+                              Navigator.pop(context); // 다이얼로그 닫기
+
+                              await patchAgvModeController
+                                  .initializeData(devices[index].id);
+                              await patchAgvStatusController
+                                  .initializeData(devices[index].id);
+                              await patchAgvDriveDistancController
+                                  .initializeData(devices[index].id);
+                              await patchAgvBatterLevelController
+                                  .initializeData(devices[index].id);
                               selectedRowIndex = null;
 
+                              // 데이터 다시 불러오기
+                              await getDeviceAgvController.initializeData();
+                              await getDeviceController.initializeData();
+
                               selectedRows.clear();
-                              Navigator.pop(context); // 다이얼로그 닫기
-                              setState(() {});
+                              // setState(() {});
                             },
                           ),
                           SizedBox(width: 30),
@@ -345,10 +360,10 @@ class _CustomAgvStatusDataTableState extends State<CustomAgvStatusDataTable> {
                             child: Text('삭제하기'),
                             onPressed: () {
                               deleteDeviceController
-                                  .initializeData(widget.devices[index].id);
+                                  .initializeData(devices[index].id);
                               // 선택된 행 삭제
-                              widget.agvs.removeAt(index);
-                              widget.devices.removeAt(index);
+                              agvs.removeAt(index);
+                              devices.removeAt(index);
 
                               // 선택된 행 초기화
                               selectedRowIndex = null;
@@ -378,17 +393,20 @@ class _CustomAgvStatusDataTableState extends State<CustomAgvStatusDataTable> {
   }
 
   void _deleteSelectedRow(int index) {
+    final agvs = getDeviceAgvController.agvs;
+    final devices = getDeviceController.filteredDevices;
+
     // 선택된 행에 대한 삭제 로직 구현
     if (selectedRowIndex != null) {
       setState(() {
         // 삭제 전에 초기화
-        deleteDeviceController.initializeData(widget.devices[index].id);
+        deleteDeviceController.initializeData(devices[index].id);
 
         print('야야${index}');
 
         // 선택된 행 삭제
-        widget.agvs.removeAt(index);
-        widget.devices.removeAt(index);
+        agvs.removeAt(index);
+        devices.removeAt(index);
 
         // 선택된 행 초기화
         selectedRowIndex = null;

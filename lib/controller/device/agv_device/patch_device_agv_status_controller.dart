@@ -15,7 +15,7 @@ class PatchDeviceAgvStatusController extends GetxController {
   final BASE_URL = '${ApiRoutes.baseUrl}${ApiRoutes.patchDeviceAgvStatus}';
   TextEditingController statusController = TextEditingController();
 
-  void initializeData(int deviceId) async {
+  Future<void> initializeData(int deviceId) async {
     final prefs = await SharedPreferences.getInstance();
     accessToken = prefs.getString('access_token');
     id = prefs.getInt('id');

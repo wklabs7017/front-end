@@ -25,12 +25,14 @@ class GetDeviceConveyorStatusController extends GetxController {
     print(conveyors.value);
   }
 
-  void initializeData() async {
+  Future<void> initializeData() async {
     final prefs = await SharedPreferences.getInstance();
     accessToken = prefs.getString('access_token');
     id = prefs.getInt('id');
 
     if (accessToken != null && id != null) {
+      conveyors.clear();
+
       fetchDevicesInRange(1, 50, accessToken!);
     } else {
       print('Access Token or ID is null');

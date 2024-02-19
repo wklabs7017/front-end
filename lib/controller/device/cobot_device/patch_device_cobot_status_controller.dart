@@ -15,19 +15,19 @@ class PatchDeviceCobotStatusController extends GetxController {
   final BASE_URL = '${ApiRoutes.baseUrl}${ApiRoutes.patchDeviceCobotStatus}';
   TextEditingController statusController = TextEditingController();
 
-  void initializeData(int deviceId) async {
+  Future<void> initializeData(int deviceId) async {
     final prefs = await SharedPreferences.getInstance();
     accessToken = prefs.getString('access_token');
     id = prefs.getInt('id');
 
     if (accessToken != null && id != null) {
-      callPatchCobotStatusDevice(deviceId);
+      await callPatchCobotStatusDevice(deviceId);
     } else {
       print('Access Token or ID is null');
     }
   }
 
-  void callPatchCobotStatusDevice(int deviceId) async {
+  Future<void> callPatchCobotStatusDevice(int deviceId) async {
     try {
       await patchCobotStatusDevice(
           deviceId!, accessToken!, statusController.text);
